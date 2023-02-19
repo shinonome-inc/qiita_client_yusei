@@ -18,26 +18,45 @@ class QiitaFeedHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ステータスバー（画面最上部の時計や電池残量が表示されている部分）の高さを取得
-    // final double statusBarHeight = MediaQuery.of(context).padding.top;
+    final Size size = MediaQuery.of(context).size;
+    double deviceWidth;
+    double deviceHeight = size.height - AppBar().preferredSize.height;
+    double aspectRatio = size.aspectRatio;
+    //アスペクト比でWidgetの幅と高さを補正
+
+    if (aspectRatio < 0.5) {
+      deviceWidth = size.width;
+      deviceHeight = size.height;
+    } else if (aspectRatio < 0.65) {
+      deviceWidth = size.width * 0.9;
+      deviceHeight = size.height * 0.9;
+    } else if (aspectRatio >= 0.65) {
+      deviceWidth = size.width * 0.65;
+      deviceHeight = size.height * 0.8;
+    } else {
+      deviceWidth = size.width;
+      deviceHeight = size.height;
+    }
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
             image: DecorationImage(
-              colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.2),
-                BlendMode.srcATop,
-              ),
-              fit: BoxFit.cover,
-              image: const AssetImage('assets/images/背景画像.png'),
-            )),
-        padding: const EdgeInsets.only(top: 220),
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.2),
+            BlendMode.srcATop,
+          ),
+          fit: BoxFit.cover,
+          image: const AssetImage('assets/images/背景画像.png'),
+        )),
+        // padding: const EdgeInsets.only(top: 220),
         alignment: Alignment.center,
 
         child: Column(
           children: [
-
-
+            SizedBox(
+              height: deviceHeight * 0.23,
+            ),
             const Text(
               'Qiita Feed App',
               style: TextStyle(
@@ -53,55 +72,46 @@ class QiitaFeedHome extends StatelessWidget {
                 fontWeight: FontWeight.w700,
                 color: Color(0xFFFFFFFF),
                 letterSpacing: 0.25,
-                height: 1.43,
+                height: 2.5,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 320),
-              child: SizedBox(
-                width: 327,
-                height: 50,
-
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF468300),
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25), // <-- Radius
-                    ),
-                  ),
-                  child: const Padding(
-                    padding:  EdgeInsets.only(top: 18, left: 16, right: 16, bottom: 17),
-                    child: Text('ログイン',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          color: Color(0xfff9fcff),
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.75,
-                          height: 1.14,
-                        )),
+            SizedBox(
+              height: deviceHeight * 0.45,
+            ),
+            SizedBox(
+              width: deviceWidth * 0.85,
+              height: deviceHeight * 0.07,
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF468300),
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25), // <-- Radius
                   ),
                 ),
-              ),
-            ),
-
-
-            const Padding(
-              padding: EdgeInsets.only(top: 34),
-              child: SizedBox(
-                width: 700,
-                height: 20,
-                child: Center(
-                  child: Text(
-                    'ログインせずに利用する',
+                child: const Text('ログイン',
                     style: TextStyle(
                       fontSize: 14.0,
+                      color: Color(0xfff9fcff),
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFFFFFFFF),
                       letterSpacing: 0.75,
-                      height: 1,
-                    ),
+                      height: 1.14,
+                    )),
+              ),
+            ),
+            SizedBox(
+              width: deviceWidth,
+              height: deviceHeight * 0.1,
+              child: const Center(
+                child: Text(
+                  'ログインせずに利用する',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFFFFFFF),
+                    letterSpacing: 0.75,
+                    height: 1,
                   ),
                 ),
               ),
