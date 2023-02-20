@@ -1,4 +1,0 @@
-#Sun Feb 19 23:09:02 JST 2023
-base.0=/Users/yuseinabana/Desktop/qiita_client_yusei/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
-renamed.0=classes.dex
-path.0=classes.dex
