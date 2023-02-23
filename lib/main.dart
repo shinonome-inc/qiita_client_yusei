@@ -24,16 +24,16 @@ class QiitaFeedHome extends StatelessWidget {
     double aspectRatio = size.aspectRatio;
     //アスペクト比でWidgetの幅と高さを補正
 
-    if (aspectRatio < 0.5) {
-      deviceWidth = size.width;
-      deviceHeight = size.height;
-    } else if (aspectRatio < 0.65) {
+    if (aspectRatio >= 0.56 && aspectRatio < 0.65) {
+      // 多くのスマホ（iPhone 5 ~ iPhone 8 Plus, iPhoneSE類）
       deviceWidth = size.width * 0.9;
       deviceHeight = size.height * 0.9;
     } else if (aspectRatio >= 0.65) {
+      // 古い世代、タブレット（iPhone ~ iPhone 4s）
       deviceWidth = size.width * 0.65;
       deviceHeight = size.height * 0.8;
     } else {
+      // 新世代 （iPhone X以降（iPhoneSEは除く））
       deviceWidth = size.width;
       deviceHeight = size.height;
     }
@@ -72,7 +72,7 @@ class QiitaFeedHome extends StatelessWidget {
                 fontWeight: FontWeight.w700,
                 color: Color(0xFFFFFFFF),
                 letterSpacing: 0.25,
-                height: 2.5,
+                height: 2,
               ),
             ),
             SizedBox(
@@ -103,15 +103,18 @@ class QiitaFeedHome extends StatelessWidget {
             SizedBox(
               width: deviceWidth,
               height: deviceHeight * 0.1,
-              child: const Center(
-                child: Text(
-                  'ログインせずに利用する',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFFFFFFFF),
-                    letterSpacing: 0.75,
-                    height: 1,
+              child: Center(
+                child: TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'ログインせずに利用する',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFFFFFFF),
+                      letterSpacing: 0.75,
+                      height: 1,
+                    ),
                   ),
                 ),
               ),
