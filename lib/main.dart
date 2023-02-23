@@ -65,6 +65,9 @@ class QiitaFeedHome extends StatelessWidget {
                 color: Color(0xFFFFFFFF),
               ),
             ),
+          const SizedBox(
+              height: 14,
+            ),
             const Text(
               '-PlayGround-',
               style: TextStyle(
@@ -72,7 +75,7 @@ class QiitaFeedHome extends StatelessWidget {
                 fontWeight: FontWeight.w700,
                 color: Color(0xFFFFFFFF),
                 letterSpacing: 0.25,
-                height: 2,
+                height: 1
               ),
             ),
             SizedBox(
