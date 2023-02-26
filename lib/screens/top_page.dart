@@ -12,6 +12,7 @@ class TopPage extends StatefulWidget {
 
 class _TopPageState extends State<TopPage> {
   bool isLoading = false;
+  double imageOpacity = 0.2;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class _TopPageState extends State<TopPage> {
           decoration: BoxDecoration(
               image: DecorationImage(
             colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.2),
+              Colors.black.withOpacity(imageOpacity),
               BlendMode.srcATop,
             ),
             fit: BoxFit.cover,
@@ -126,14 +127,15 @@ class _TopPageState extends State<TopPage> {
                     sigmaY: isLoading ? 3 : 0,
                   ),
                   blendMode: BlendMode.srcOver,
-                  child: Container(color: Colors.black.withOpacity(0)),
+                  child: Container(),
                 ),
             ],
           ),
         ),
-        if (isLoading) const Center(child: CupertinoActivityIndicator(
-            radius: 20.0, color: CupertinoColors.activeBlue
-        ))
+        if (isLoading)
+          const Center(
+              child: CupertinoActivityIndicator(
+                  radius: 20.0, color: CupertinoColors.white))
       ]),
     );
   }
@@ -141,10 +143,12 @@ class _TopPageState extends State<TopPage> {
   void _loading() {
     setState(() {
       isLoading = true;
+      imageOpacity = 0.3;
       //3秒間のローディングアニメーションを追加
       Future.delayed(const Duration(seconds: 3), () {
         setState(() {
           isLoading = false;
+          imageOpacity = 0.2;
         });
       });
     });
