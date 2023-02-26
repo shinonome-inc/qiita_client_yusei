@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TopPage extends StatefulWidget {
@@ -8,11 +11,11 @@ class TopPage extends StatefulWidget {
 }
 
 class _TopPageState extends State<TopPage> {
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery
-        .of(context)
-        .size;
+    final Size size = MediaQuery.of(context).size;
     double deviceWidth;
     double deviceHeight = size.height - AppBar().preferredSize.height;
     double aspectRatio = size.aspectRatio;
@@ -33,93 +36,117 @@ class _TopPageState extends State<TopPage> {
     }
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-            image: DecorationImage(
-              colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.2),
-                BlendMode.srcATop,
-              ),
-              fit: BoxFit.cover,
-              image: const AssetImage('assets/images/背景画像.png'),
-            )),
-        // padding: const EdgeInsets.only(top: 220),
-        alignment: Alignment.center,
+      body: Stack(children: [
+        Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.2),
+              BlendMode.srcATop,
+            ),
+            fit: BoxFit.cover,
+            image: const AssetImage('assets/images/背景画像.png'),
+          )),
+          // padding: const EdgeInsets.only(top: 220),
+          alignment: Alignment.center,
 
-        child: Column(
-          children: [
-            SizedBox(
-              height: deviceHeight * 0.23,
-            ),
-            const Text(
-              'Qiita Feed App',
-              style: TextStyle(
-                fontFamily: 'Pacifico',
-                fontSize: 36.0,
-                color: Color(0xFFFFFFFF),
+          child: Column(
+            children: [
+              SizedBox(
+                height: deviceHeight * 0.23,
               ),
-            ),
-            const SizedBox(
-              height: 14,
-            ),
-            const Text(
-              '-PlayGround-',
-              style: TextStyle(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w700,
+              const Text(
+                'Qiita Feed App',
+                style: TextStyle(
+                  fontFamily: 'Pacifico',
+                  fontSize: 36.0,
                   color: Color(0xFFFFFFFF),
-                  letterSpacing: 0.25,
-                  height: 1
-              ),
-            ),
-            SizedBox(
-              height: deviceHeight * 0.45,
-            ),
-            SizedBox(
-              width: deviceWidth * 0.85,
-              height: deviceHeight * 0.07,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF468300),
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25), // <-- Radius
-                  ),
                 ),
-                child: const Text('ログイン',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: Color(0xfff9fcff),
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.75,
-                      height: 1.14,
-                    )),
               ),
-            ),
-            SizedBox(
-              width: deviceWidth,
-              height: deviceHeight * 0.1,
-              child: Center(
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'ログインせずに利用する',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFFFFFFFF),
-                      letterSpacing: 0.75,
-                      height: 1,
+              const SizedBox(
+                height: 14,
+              ),
+              const Text(
+                '-PlayGround-',
+                style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFFFFFFF),
+                    letterSpacing: 0.25,
+                    height: 1),
+              ),
+              SizedBox(
+                height: deviceHeight * 0.45,
+              ),
+              SizedBox(
+                width: deviceWidth * 0.85,
+                height: deviceHeight * 0.07,
+                child: ElevatedButton(
+                  onPressed: _loading,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF468300),
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25), // <-- Radius
+                    ),
+                  ),
+                  child: const Text('ログイン',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Color(0xfff9fcff),
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.75,
+                        height: 1.14,
+                      )),
+                ),
+              ),
+              SizedBox(
+                width: deviceWidth,
+                height: deviceHeight * 0.1,
+                child: Center(
+                  child: TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'ログインせずに利用する',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFFFFFFF),
+                        letterSpacing: 0.75,
+                        height: 1,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+              if (isLoading)
+                BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: isLoading ? 3 : 0,
+                    sigmaY: isLoading ? 3 : 0,
+                  ),
+                  blendMode: BlendMode.srcOver,
+                  child: Container(color: Colors.black.withOpacity(0)),
+                ),
+            ],
+          ),
         ),
-      ),
+        if (isLoading) const Center(child: CupertinoActivityIndicator(
+            radius: 20.0, color: CupertinoColors.activeBlue
+        ))
+      ]),
     );
   }
 
+  void _loading() {
+    setState(() {
+      isLoading = true;
+      //3秒間のローディングアニメーションを追加
+      Future.delayed(const Duration(seconds: 3), () {
+        setState(() {
+          isLoading = false;
+        });
+      });
+    });
+  }
 }
