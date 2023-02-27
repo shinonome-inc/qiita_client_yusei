@@ -123,8 +123,8 @@ class _TopPageState extends State<TopPage> {
               if (isLoading)
                 BackdropFilter(
                   filter: ImageFilter.blur(
-                    sigmaX: isLoading ? 3 : 0,
-                    sigmaY: isLoading ? 3 : 0,
+                    sigmaX: 3,
+                    sigmaY: 3,
                   ),
                   blendMode: BlendMode.srcOver,
                   child: Container(),
