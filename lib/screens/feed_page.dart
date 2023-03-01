@@ -10,20 +10,8 @@ class FeedPage extends StatefulWidget {
 class _FeedPageState extends State<FeedPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading : false,
-          title : const Text("Feed",
-            style: TextStyle(
-              fontFamily: 'Pacifico',
-              fontSize: 17.0,
-              color: Colors.black,
-            ),
-          ),
-
-        ),
-        body : const Center(
+    return const Scaffold(
+        body : Center(
           child: SizedBox(
             child: Text("フィードページ"),
           ),

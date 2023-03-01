@@ -10,20 +10,8 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading : false,
-          title: const Text(
-            "MyPage",
-            style: TextStyle(
-              fontFamily: 'Pacifico',
-              fontSize: 17.0,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        body: const Center(
+    return const Scaffold(
+        body: Center(
           child: SizedBox(
             child: Text("マイページ"),
           ),

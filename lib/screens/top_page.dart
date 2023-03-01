@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/screens/feed_page.dart';
+import 'package:flutter_app/screens/home_page.dart';
 
 class TopPage extends StatefulWidget {
   const TopPage({Key? key}) : super(key: key);
@@ -164,7 +164,7 @@ class _TopPageState extends State<TopPage> {
   void _toFeed() {
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const FeedPage()));
+          context, MaterialPageRoute(builder: (context) => const HomePage()));
     });
   }
 }
