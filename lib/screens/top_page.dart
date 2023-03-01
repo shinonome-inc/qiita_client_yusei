@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/screens/feed_page.dart';
 
 class TopPage extends StatefulWidget {
   const TopPage({Key? key}) : super(key: key);
@@ -83,7 +84,6 @@ class _TopPageState extends State<TopPage> {
                 width: deviceWidth * 0.85,
                 height: deviceHeight * 0.07,
                 child: ElevatedButton(
-                  onPressed: _loading,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF468300),
                     shadowColor: Colors.transparent,
@@ -99,6 +99,13 @@ class _TopPageState extends State<TopPage> {
                         letterSpacing: 0.75,
                         height: 1.14,
                       )),
+                  onPressed: () {
+                    // 3秒間ローディング
+                    _loading();
+                    // TODO ログイン処理を実装する
+                    //FeedPageに遷移
+                    _toFeed();
+                  },
                 ),
               ),
               SizedBox(
@@ -151,6 +158,13 @@ class _TopPageState extends State<TopPage> {
           imageOpacity = 0.2;
         });
       });
+    });
+  }
+
+  void _toFeed() {
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const FeedPage()));
     });
   }
 }
