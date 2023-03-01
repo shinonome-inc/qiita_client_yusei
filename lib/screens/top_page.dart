@@ -101,10 +101,8 @@ class _TopPageState extends State<TopPage> {
                       )),
                   onPressed: () {
                     // 3秒間ローディング
-                    _loading();
+                    _loadingToFeed();
                     // TODO ログイン処理を実装する
-                    //FeedPageに遷移
-                    _toFeed();
                   },
                 ),
               ),
@@ -113,7 +111,9 @@ class _TopPageState extends State<TopPage> {
                 height: deviceHeight * 0.1,
                 child: Center(
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _toFeed();
+                    },
                     child: const Text(
                       'ログインせずに利用する',
                       style: TextStyle(
@@ -147,7 +147,7 @@ class _TopPageState extends State<TopPage> {
     );
   }
 
-  void _loading() {
+  void _loadingToFeed() {
     setState(() {
       isLoading = true;
       imageOpacity = 0.3;
@@ -156,15 +156,14 @@ class _TopPageState extends State<TopPage> {
         setState(() {
           isLoading = false;
           imageOpacity = 0.2;
+          _toFeed();
         });
       });
     });
   }
 
   void _toFeed() {
-    Future.delayed(const Duration(seconds: 3), () {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => const HomePage()));
-    });
   }
 }
