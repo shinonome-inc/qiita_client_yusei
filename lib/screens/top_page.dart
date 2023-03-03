@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/screens/home_page.dart';
 
 class TopPage extends StatefulWidget {
   const TopPage({Key? key}) : super(key: key);
@@ -83,7 +84,6 @@ class _TopPageState extends State<TopPage> {
                 width: deviceWidth * 0.85,
                 height: deviceHeight * 0.07,
                 child: ElevatedButton(
-                  onPressed: _loading,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF468300),
                     shadowColor: Colors.transparent,
@@ -99,6 +99,11 @@ class _TopPageState extends State<TopPage> {
                         letterSpacing: 0.75,
                         height: 1.14,
                       )),
+                  onPressed: () {
+                    // 3秒間ローディング
+                    _loadingToFeed();
+                    // TODO ログイン処理を実装する
+                  },
                 ),
               ),
               SizedBox(
@@ -106,7 +111,9 @@ class _TopPageState extends State<TopPage> {
                 height: deviceHeight * 0.1,
                 child: Center(
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _toFeed();
+                    },
                     child: const Text(
                       'ログインせずに利用する',
                       style: TextStyle(
@@ -140,7 +147,7 @@ class _TopPageState extends State<TopPage> {
     );
   }
 
-  void _loading() {
+  void _loadingToFeed() {
     setState(() {
       isLoading = true;
       imageOpacity = 0.3;
@@ -149,8 +156,14 @@ class _TopPageState extends State<TopPage> {
         setState(() {
           isLoading = false;
           imageOpacity = 0.2;
+          _toFeed();
         });
       });
     });
+  }
+
+  void _toFeed() {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const HomePage()));
   }
 }
