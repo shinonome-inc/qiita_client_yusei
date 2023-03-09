@@ -10,9 +10,8 @@ import '../main.dart';
 import 'package:flutter_app/components/no_internet_widget.dart';
 
 class FeedPage extends StatefulWidget {
-  const FeedPage({Key? key, required this.title}) : super(key: key);
+  const FeedPage({Key? key,}) : super(key: key);
 
-  final String title;
 
   @override
   State<FeedPage> createState() => _FeedPageState();
@@ -95,6 +94,7 @@ class _FeedPageState extends State<FeedPage> {
 
           // レスポンスをパースし、記事のリストを作成する
           final List<dynamic> newItems = json.decode(response.body);
+
           setState(() {
             if (newItems.isEmpty) {
               // 検索結果が見つからなかった場合は、現在の記事リストをクリアして、最初のページから再度取得する
@@ -192,9 +192,6 @@ class _FeedPageState extends State<FeedPage> {
               ),
             ),
             onTap: () async {
-              setState(() {
-                isLoading = true;
-              });
               await showModalBottomSheet(
                 backgroundColor: Colors.transparent,
                 context: context,
@@ -202,7 +199,6 @@ class _FeedPageState extends State<FeedPage> {
                 builder: (context) => SizedBox(
                   height: MediaQuery.of(context).size.height * 0.9,
                   child: Column(
-                    // crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Container(
                         padding: const EdgeInsets.only(bottom: 11),
@@ -231,7 +227,6 @@ class _FeedPageState extends State<FeedPage> {
                   ),
                 ),
               );
-              await fetchQiitaItems();
             },
           ),
           const Divider(
@@ -328,21 +323,19 @@ class _FeedPageState extends State<FeedPage> {
             visible: itemsList.isNotEmpty,
             child: NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
+                // リストの末尾にスクロールした場合、続きのページを読み込む
                 if (!isLastPage &&
                     !isLoading &&
                     scrollInfo.metrics.pixels >=
-                        scrollInfo.metrics.maxScrollExtent + 50) {
+                        scrollInfo.metrics.maxScrollExtent + 10) {
                   fetchQiitaItems();
                 }
 
-                // リストの先頭にスクロールした時に更新する
-                if (scrollInfo.metrics.pixels == 0) {
-                  setState(() {
-                    itemsList = [];
-                    currentPage = 1;
-                    isLastPage = false;
-                  });
-                  fetchQiitaItems();
+                if (Theme.of(context).platform == TargetPlatform.android) {
+                  if (scrollInfo.metrics.pixels ==
+                      scrollInfo.metrics.maxScrollExtent) {
+                    fetchQiitaItems();
+                  }
                 }
 
                 return false;
@@ -353,14 +346,19 @@ class _FeedPageState extends State<FeedPage> {
                     child: ListView.builder(
                       //Listの最新記事取得スクロールの方向が変わる
                       reverse: true,
+                      shrinkWrap: true,
                       itemCount: itemsList.isNotEmpty
                           ? itemsList.length + (isLastPage ? 0 : 1)
                           : 1,
                       itemBuilder: (BuildContext context, int index) {
+                        final padding =
+                            Theme.of(context).platform == TargetPlatform.android
+                                ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
+                                : const EdgeInsets.fromLTRB(0, 10, 0, 20);
                         if (index == itemsList.length) {
                           return Center(
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
+                              padding: padding,
                               child: isLoading
                                   ? const CupertinoActivityIndicator(
                                       radius: 18,
@@ -396,7 +394,7 @@ class _FeedPageState extends State<FeedPage> {
               bool isConnected = await checkConnectivity();
               if (isConnected) {
                 setState(() {
-                  interNetConnected = true; // 追加
+                  interNetConnected = true;
                 });
                 fetchQiitaItems();
               } else {
@@ -439,32 +437,33 @@ class _FeedPageState extends State<FeedPage> {
     if (!interNetConnected && itemsList.isEmpty) {
       return Container();
     } else {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 227),
-          child: Column(
-            children: const [
-              Icon(Icons.search_off, size: 48),
-              // SizedBox(height: 16),
-              Text(
-                '検索にマッチする記事はありませんでした',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF333333),
-                  letterSpacing: -0.24,
+      return SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 227),
+            child: Column(
+              children: const [
+                Icon(Icons.search_off, size: 48),
+                Text(
+                  '検索にマッチする記事はありませんでした',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF333333),
+                    letterSpacing: -0.24,
+                  ),
                 ),
-              ),
-              SizedBox(height: 17),
-              Text(
-                '検索条件を変えるなどして、再度検索してください。',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF828282),
-                  height: 2,
+                SizedBox(height: 17),
+                Text(
+                  '検索条件を変えるなどして、再度検索してください。',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF828282),
+                    height: 2,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );

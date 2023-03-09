@@ -11,19 +11,18 @@ class WebViewPage extends StatefulWidget {
 }
 
 class _WebViewPageState extends State<WebViewPage> {
-  late final WebViewController _controller;
+  late WebViewController _controller = WebViewController();
 
   bool _isLoading = false;
-  double? newHeight;
+  double? _newHeight;
 
-  Future<void> getNewHeight() async {
+  Future<double> _getNewHeight() async {
     const String javaScript = 'document.documentElement.scrollHeight;';
     final result = await _controller.runJavaScriptReturningResult(javaScript);
-    final double getHeight = double.parse(result.toString());
-    setState(() {
-      newHeight = getHeight;
-    });
+    final getHeight = double.tryParse(result.toString()) ?? 0;
+    return getHeight;
   }
+
 
   @override
   void initState() {
@@ -37,10 +36,11 @@ class _WebViewPageState extends State<WebViewPage> {
               _isLoading = true;
             });
           },
-          onPageFinished: (String url) {
+          onPageFinished: (String url) async {
+            final newHeight = await _getNewHeight();
             setState(() {
               _isLoading = false;
-              getNewHeight();
+              _newHeight = newHeight;
             });
           },
         ),
@@ -50,21 +50,23 @@ class _WebViewPageState extends State<WebViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Scaffold(
+      body: Column(
         children: [
           if (_isLoading) const LinearProgressIndicator(),
           Expanded(
-          child: SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(),
-                     child: SizedBox(
-                       height: newHeight ?? MediaQuery.of(context).size.height * 0.9,
-                       child: WebViewWidget(
-                           controller: _controller
-                       ),
-                     ),
-               )
-            ),
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: SizedBox(
+                  height: _newHeight ?? MediaQuery.of(context).size.height * 0.9,
+                  child: WebViewWidget(
+                      controller: _controller
+                  ),
+                ),
+              )
+          ),
         ],
-      );
+      ),
+    );
   }
 }
