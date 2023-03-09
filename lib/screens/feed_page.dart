@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../components/web_view_screen.dart';
+import '../components/web_view_page.dart';
 import '../main.dart';
 import 'package:flutter_app/components/no_internet_widget.dart';
 
