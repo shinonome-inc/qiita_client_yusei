@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../api/qiita_api_service.dart';
 import '../components/web_view_screen.dart';
 import '../main.dart';
 import 'package:flutter_app/components/no_internet_widget.dart';
@@ -18,11 +16,6 @@ class FeedPage extends StatefulWidget {
 }
 
 class _FeedPageState extends State<FeedPage> {
-  // Qiita APIのエンドポイントURL
-  final String apiUrl = 'https://qiita.com/api/v2/items';
-
-  // Qiita APIのアクセストークン
-  final String accessToken = 'b1150483b71f6070cb3f9388cb03993bc510987d';
 
   // 検索キーワード
   String searchKeyword = '';
@@ -33,10 +26,9 @@ class _FeedPageState extends State<FeedPage> {
   bool isLoading = false;
   bool isLastPage = false;
   List<dynamic> itemsList = [];
-
-  // キャッシュのための変数
-  final Map<String, dynamic> cache = {};
   bool _firstLoading = true;
+
+  final QiitaApiService _qiitaApiService = QiitaApiService();
 
   // ページを開いた時に一度だけQiitaの記事を取得する
   @override
@@ -47,7 +39,7 @@ class _FeedPageState extends State<FeedPage> {
     Future.delayed(Duration.zero, () {
       checkConnectivity().then((isConnected) {
         if (isConnected) {
-          fetchQiitaItems();
+          pullQiitaItems();
         } else {
           setState(() {
             interNetConnected = false;
@@ -57,79 +49,38 @@ class _FeedPageState extends State<FeedPage> {
       _firstLoading = false;
     });
   }
-
-  // Qiita APIを呼び出し、記事を取得する
-  Future<void> fetchQiitaItems() async {
+// qiita_api_service.dartのfetchQiitaItemsを呼び出し、記事を取得する
+  Future<void> pullQiitaItems() async {
     if (!isLastPage) {
       setState(() {
         isLoading = true;
       });
 
-      String url = '$apiUrl?per_page=$perPage&page=$currentPage';
+      List<dynamic> newItems = await _qiitaApiService.fetchQiitaItems(
+        currentPage: currentPage,
+        perPage: perPage,
+        searchKeyword: searchKeyword,
+        isLastPage: isLastPage,
+      );
 
-      // 検索キーワードがある場合、URLに追加する
-      if (searchKeyword.isNotEmpty) {
-        url += '&query=$searchKeyword';
-      }
-
-      // キャッシュがある場合、キャッシュを使用する
-      if (cache.containsKey(url)) {
-        setState(() {
-          itemsList.addAll(cache[url]);
-          isLoading = false;
+      setState(() {
+        if (newItems.isEmpty) {
+          // 検索結果が見つからなかった場合は、現在の記事リストをクリアして、最初のページから再度取得する
+          itemsList.clear();
+          isLastPage = true;
+        } else {
+          itemsList.addAll(newItems);
           currentPage++;
-          if (cache[url].length < perPage) {
+          if (newItems.length < perPage) {
             isLastPage = true;
           }
-        });
-      } else {
-        try {
-          // Qiita APIにリクエストを送信する
-          final response = await http.get(
-            Uri.parse(url),
-            headers: {
-              'Authorization': 'Bearer $accessToken',
-            },
-          );
-
-          // レスポンスをパースし、記事のリストを作成する
-          final List<dynamic> newItems = json.decode(response.body);
-
-          setState(() {
-            if (newItems.isEmpty) {
-              // 検索結果が見つからなかった場合は、現在の記事リストをクリアして、最初のページから再度取得する
-              itemsList.clear();
-              isLastPage = true;
-            } else {
-              itemsList.addAll(newItems);
-              currentPage++;
-              if (newItems.length < perPage) {
-                isLastPage = true;
-              }
-            }
-            isLoading = false;
-          });
-
-          // キャッシュに記事を追加する
-          cache[url] = newItems;
-
-          // キャッシュのクリア
-          if (cache.length > 10) {
-            cache.remove(cache.keys.first);
-          }
-        } catch (e) {
-          // エラーが発生した場合は、isLoadingをfalseにする
-          setState(() {
-            isLoading = false;
-          });
-          if (kDebugMode) {
-            print('fetchQiitaItems error: $e');
-          }
         }
-      }
+        isLoading = false;
+      });
     }
     _firstLoading = false;
   }
+
 
   // ListViewに表示する記事のWidgetを作成する
   Widget _buildListItem(
@@ -145,7 +96,7 @@ class _FeedPageState extends State<FeedPage> {
     return RefreshIndicator(
       onRefresh: () async {
         // スワイプ時に更新したい処理を書く
-        await fetchQiitaItems();
+        await pullQiitaItems();
       },
       child: Column(
         children: [
@@ -328,13 +279,13 @@ class _FeedPageState extends State<FeedPage> {
                     !isLoading &&
                     scrollInfo.metrics.pixels >=
                         scrollInfo.metrics.maxScrollExtent + 10) {
-                  fetchQiitaItems();
+                  pullQiitaItems();
                 }
 
                 if (Theme.of(context).platform == TargetPlatform.android) {
                   if (scrollInfo.metrics.pixels ==
                       scrollInfo.metrics.maxScrollExtent) {
-                    fetchQiitaItems();
+                    pullQiitaItems();
                   }
                 }
 
@@ -396,7 +347,7 @@ class _FeedPageState extends State<FeedPage> {
                 setState(() {
                   interNetConnected = true;
                 });
-                fetchQiitaItems();
+                pullQiitaItems();
               } else {
                 // ネットワークに接続されていない場合はエラーメッセージを表示する
                 setState(() {
@@ -428,7 +379,7 @@ class _FeedPageState extends State<FeedPage> {
       isLastPage = false;
     });
     itemsList.clear();
-    await fetchQiitaItems();
+    await pullQiitaItems();
   }
 
   // ListViewに表示する記事がない場合に表示するWidget
