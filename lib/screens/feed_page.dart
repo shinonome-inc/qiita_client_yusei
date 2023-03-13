@@ -25,8 +25,6 @@ class _FeedPageState extends State<FeedPage> {
   @override
   void initState() {
     super.initState();
-
-    // fetchQiitaItems();
     Future.delayed(Duration.zero, () {
       checkConnectivity().then((isConnected) async {
         if (isConnected) {
@@ -185,7 +183,7 @@ class _FeedPageState extends State<FeedPage> {
                     },
 
                     // 検索キーワードを更新すると同時に、記事を更新する
-                    onSubmitted: _handleSubmitted,
+                    onSubmitted: feedViewModel.handleSubmitted,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.fromLTRB(30, 7, 0, 7),
                       hintText: 'Search',
@@ -332,19 +330,6 @@ class _FeedPageState extends State<FeedPage> {
         ),
       ),
     );
-  }
-
-// TextFieldでEnterを押した時に呼ばれる
-
-  Future<void> _handleSubmitted(String value) async {
-    setState(() {
-      feedViewModel.searchKeyword = value;
-      feedViewModel.firstLoading = true;
-      feedViewModel.currentPage = 1;
-      feedViewModel.isLastPage = false;
-    });
-    feedViewModel.itemsList.clear();
-    await feedViewModel.searchQiitaItems(value);
   }
 
   // ListViewに表示する記事がない場合に表示するWidget

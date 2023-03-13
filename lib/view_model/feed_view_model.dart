@@ -55,4 +55,15 @@ class FeedViewModel extends ChangeNotifier {
     itemsList.clear();
     await pullQiitaItems();
   }
+
+  // TextFieldでEnterを押した時に呼ばれる
+
+  Future<void> handleSubmitted(String value) async {
+    searchKeyword = value;
+    firstLoading = true;
+    currentPage = 1;
+    isLastPage = false;
+    itemsList.clear();
+    await searchQiitaItems(value);
+  }
 }
