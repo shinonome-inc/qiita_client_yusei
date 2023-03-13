@@ -1,34 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../api/qiita_api_service.dart';
-import '../components/web_view_screen.dart';
 import '../main.dart';
-import 'package:flutter_app/components/no_internet_widget.dart';
+import '../components/no_internet_widget.dart';
+import '../components/web_view_screen.dart';
+import '../view_model/feed_view_model.dart';
 
 class FeedPage extends StatefulWidget {
-  const FeedPage({Key? key,}) : super(key: key);
-
+  const FeedPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<FeedPage> createState() => _FeedPageState();
+  State<FeedPage> createState() =>
+      _FeedPageState(); // _FeedPageViewState を使用するように変更
 }
 
 class _FeedPageState extends State<FeedPage> {
-
-  // 検索キーワード
-  String searchKeyword = '';
-
-  // ページネーションに利用する変数
-  int currentPage = 1;
-  int perPage = 20;
-  bool isLoading = false;
-  bool isLastPage = false;
-  List<dynamic> itemsList = [];
-  bool _firstLoading = true;
-
-  final QiitaApiService _qiitaApiService = QiitaApiService();
+  final FeedViewModel feedViewModel = FeedViewModel();
 
   // ページを開いた時に一度だけQiitaの記事を取得する
   @override
@@ -37,57 +28,26 @@ class _FeedPageState extends State<FeedPage> {
 
     // fetchQiitaItems();
     Future.delayed(Duration.zero, () {
-      checkConnectivity().then((isConnected) {
+      checkConnectivity().then((isConnected) async {
         if (isConnected) {
-          pullQiitaItems();
+          await feedViewModel.pullQiitaItems();
         } else {
           setState(() {
             interNetConnected = false;
           });
         }
       });
-      _firstLoading = false;
+      feedViewModel.firstLoading = false;
     });
   }
-// qiita_api_service.dartのfetchQiitaItemsを呼び出し、記事を取得する
-  Future<void> pullQiitaItems() async {
-    if (!isLastPage) {
-      setState(() {
-        isLoading = true;
-      });
-
-      List<dynamic> newItems = await _qiitaApiService.fetchQiitaItems(
-        currentPage: currentPage,
-        perPage: perPage,
-        searchKeyword: searchKeyword,
-        isLastPage: isLastPage,
-      );
-
-      setState(() {
-        if (newItems.isEmpty) {
-          // 検索結果が見つからなかった場合は、現在の記事リストをクリアして、最初のページから再度取得する
-          itemsList.clear();
-          isLastPage = true;
-        } else {
-          itemsList.addAll(newItems);
-          currentPage++;
-          if (newItems.length < perPage) {
-            isLastPage = true;
-          }
-        }
-        isLoading = false;
-      });
-    }
-    _firstLoading = false;
-  }
-
 
   // ListViewに表示する記事のWidgetを作成する
   Widget _buildListItem(
     BuildContext context,
     int index,
+    itemsList,
   ) {
-    final item = itemsList[index];
+    final item = feedViewModel.itemsList[index];
     final user = item['user'];
     final formattedDate =
         DateFormat('yyyy/MM/dd').format(DateTime.parse(item['created_at']));
@@ -96,7 +56,7 @@ class _FeedPageState extends State<FeedPage> {
     return RefreshIndicator(
       onRefresh: () async {
         // スワイプ時に更新したい処理を書く
-        await pullQiitaItems();
+        await feedViewModel.pullQiitaItems();
       },
       child: Column(
         children: [
@@ -195,17 +155,6 @@ class _FeedPageState extends State<FeedPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-    double aspectRatio = size.aspectRatio;
-    //アスペクト比でWidgetの幅と高さを補正
-
-    if (aspectRatio >= 0.56 && aspectRatio < 0.65) {
-      // 多くのスマホ（iPhone 5 ~ iPhone 8 Plus, iPhoneSE類）
-    } else if (aspectRatio >= 0.65) {
-      // 古い世代、タブレット（iPhone ~ iPhone 4s）
-    } else {
-      // 新世代 （iPhone X以降（iPhoneSEは除く））
-    }
     return Scaffold(
       appBar: !interNetConnected
           ? null
@@ -231,7 +180,7 @@ class _FeedPageState extends State<FeedPage> {
                     controller: _clearController,
                     onChanged: (value) {
                       setState(() {
-                        searchKeyword = value;
+                        feedViewModel.searchKeyword = value;
                       });
                     },
 
@@ -244,11 +193,11 @@ class _FeedPageState extends State<FeedPage> {
                         Icons.search,
                         // color: Color(0xFF74C13A)
                       ),
-                      suffixIcon: searchKeyword.isNotEmpty
+                      suffixIcon: feedViewModel.searchKeyword.isNotEmpty
                           ? IconButton(
                               onPressed: () {
                                 setState(() {
-                                  searchKeyword = '';
+                                  feedViewModel.searchKeyword = '';
                                 });
                                 _clearController.clear();
                               },
@@ -268,103 +217,119 @@ class _FeedPageState extends State<FeedPage> {
                 ),
               ),
             ),
-      body: Stack(
-        children: [
-          Visibility(
-            visible: itemsList.isNotEmpty,
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                // リストの末尾にスクロールした場合、続きのページを読み込む
-                if (!isLastPage &&
-                    !isLoading &&
-                    scrollInfo.metrics.pixels >=
-                        scrollInfo.metrics.maxScrollExtent + 10) {
-                  pullQiitaItems();
-                }
-
-                if (Theme.of(context).platform == TargetPlatform.android) {
-                  if (scrollInfo.metrics.pixels ==
-                      scrollInfo.metrics.maxScrollExtent) {
-                    pullQiitaItems();
-                  }
-                }
-
-                return false;
-              },
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      //Listの最新記事取得スクロールの方向が変わる
-                      reverse: true,
-                      shrinkWrap: true,
-                      itemCount: itemsList.isNotEmpty
-                          ? itemsList.length + (isLastPage ? 0 : 1)
-                          : 1,
-                      itemBuilder: (BuildContext context, int index) {
-                        final padding =
-                            Theme.of(context).platform == TargetPlatform.android
-                                ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
-                                : const EdgeInsets.fromLTRB(0, 10, 0, 20);
-                        if (index == itemsList.length) {
-                          return Center(
-                            child: Padding(
-                              padding: padding,
-                              child: isLoading
-                                  ? const CupertinoActivityIndicator(
-                                      radius: 18,
-                                      color: Color(0xFF6A717D),
-                                    )
-                                  : Container(),
-                            ),
-                          );
-                        } else {
-                          return _buildListItem(context, index);
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          //追加ローディング中は表示しない
-          Visibility(
-              visible: isLoading && itemsList.isEmpty,
-              child: const Center(
+      body: ChangeNotifierProvider(
+        create: (_) => feedViewModel,
+        child: Consumer<FeedViewModel>(
+          builder: (context, model, child) {
+            if (model.isLoading && model.itemsList.isEmpty) {
+              return const Center(
                 child: CupertinoActivityIndicator(
                   radius: 22,
                   color: Color(0xFF6A717D),
                 ),
-              )),
+              );
+            } else if (!interNetConnected && model.itemsList.isEmpty) {
+              return NoInternetWidget(
+                interNetConnected: interNetConnected,
+                onPressed: () async {
+                  // ネットワーク接続状態を確認する
+                  bool isConnected = await checkConnectivity();
+                  if (isConnected) {
+                    setState(() {
+                      interNetConnected = true;
+                    });
+                    model.pullQiitaItems();
+                  } else {
+                    // ネットワークに接続されていない場合はエラーメッセージを表示する
+                    setState(() {
+                      interNetConnected = false;
+                    });
+                  }
+                },
+              );
+            } else {
+              return Stack(
+                children: [
+                  Visibility(
+                    visible: model.itemsList.isNotEmpty,
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        if (!model.isLastPage &&
+                            !model.isLoading &&
+                            scrollInfo.metrics.pixels >=
+                                scrollInfo.metrics.maxScrollExtent + 10) {
+                          model.pullQiitaItems();
+                        }
 
-          NoInternetWidget(
-            interNetConnected: interNetConnected,
-            onPressed: () async {
-              // ネットワーク接続状態を確認する
-              bool isConnected = await checkConnectivity();
-              if (isConnected) {
-                setState(() {
-                  interNetConnected = true;
-                });
-                pullQiitaItems();
-              } else {
-                // ネットワークに接続されていない場合はエラーメッセージを表示する
-                setState(() {
-                  interNetConnected = false;
-                });
-              }
-            },
-          ),
-
-          Visibility(
-            visible: !(itemsList.isNotEmpty) &&
-                !isLoading &&
-                !_firstLoading &&
-                interNetConnected,
-            child: _buildNoResultWidget(),
-          ),
-        ],
+                        if (Theme.of(context).platform ==
+                            TargetPlatform.android) {
+                          if (scrollInfo.metrics.pixels ==
+                              scrollInfo.metrics.maxScrollExtent) {
+                            model.pullQiitaItems();
+                          }
+                        }
+                        return false;
+                      },
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: ListView.builder(
+                              //Listの最新記事取得スクロールの方向が変わる
+                              reverse: true,
+                              shrinkWrap: true,
+                              itemCount: model.itemsList.isNotEmpty
+                                  ? model.itemsList.length +
+                                      (model.isLastPage ? 0 : 1)
+                                  : 1,
+                              itemBuilder: (BuildContext context, int index) {
+                                final padding = Theme.of(context).platform ==
+                                        TargetPlatform.android
+                                    ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
+                                    : const EdgeInsets.fromLTRB(0, 10, 0, 20);
+                                if (index == model.itemsList.length) {
+                                  return Center(
+                                    child: Padding(
+                                      padding: padding,
+                                      child: model.isLoading
+                                          ? const CupertinoActivityIndicator(
+                                              radius: 18,
+                                              color: Color(0xFF6A717D),
+                                            )
+                                          : Container(),
+                                    ),
+                                  );
+                                } else {
+                                  return _buildListItem(
+                                      context, index, model.itemsList);
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  //追加ローディング中は表示しない
+                  Visibility(
+                      visible: model.isLoading && model.itemsList.isEmpty,
+                      child: const Center(
+                        child: CupertinoActivityIndicator(
+                          radius: 22,
+                          color: Color(0xFF6A717D),
+                        ),
+                      )),
+                  Visibility(
+                    visible: !(model.itemsList.isNotEmpty) &&
+                        !model.isLoading &&
+                        !model.firstLoading &&
+                        interNetConnected,
+                    child: _buildNoResultWidget(),
+                  ),
+                ],
+              );
+            }
+          },
+        ),
       ),
     );
   }
@@ -373,19 +338,19 @@ class _FeedPageState extends State<FeedPage> {
 
   Future<void> _handleSubmitted(String value) async {
     setState(() {
-      searchKeyword = value;
-      _firstLoading = true;
-      currentPage = 1;
-      isLastPage = false;
+      feedViewModel.searchKeyword = value;
+      feedViewModel.firstLoading = true;
+      feedViewModel.currentPage = 1;
+      feedViewModel.isLastPage = false;
     });
-    itemsList.clear();
-    await pullQiitaItems();
+    feedViewModel.itemsList.clear();
+    await feedViewModel.searchQiitaItems(value);
   }
 
   // ListViewに表示する記事がない場合に表示するWidget
 // ListViewに表示する記事がない場合に表示するWidget
   Widget _buildNoResultWidget() {
-    if (!interNetConnected && itemsList.isEmpty) {
+    if (!interNetConnected && feedViewModel.itemsList.isEmpty) {
       return Container();
     } else {
       return SingleChildScrollView(
