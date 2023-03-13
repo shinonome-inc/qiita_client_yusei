@@ -39,12 +39,12 @@ dependencies:
   english_words: ^4.0.0
   http: ^0.13.5
   intl: ^0.18.0
-  webview_flutter: ^4.0.6
+  webview_flutter: ^3.0.4
 #  connectivity_plus: ^3.0.3
   connectivity: ^3.0.6
   cached_network_image: ^3.2.3
-  webview_flutter_android: ^3.4.2
-  webview_flutter_wkwebview: ^3.2.1
+#  webview_flutter_android: ^3.4.2
+#  webview_flutter_wkwebview: ^3.2.1
 
 dev_dependencies:
   flutter_test:
