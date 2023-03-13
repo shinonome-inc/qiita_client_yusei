@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/components/custom_btn.dart';
 import 'package:flutter_app/screens/home_page.dart';
 
 class TopPage extends StatefulWidget {
@@ -83,27 +84,13 @@ class _TopPageState extends State<TopPage> {
               SizedBox(
                 width: deviceWidth * 0.85,
                 height: deviceHeight * 0.07,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF468300),
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25), // <-- Radius
-                    ),
-                  ),
-                  child: const Text('ログイン',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Color(0xfff9fcff),
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.75,
-                        height: 1.14,
-                      )),
+                child: CustomButton(
+                  btnLoading: false,
                   onPressed: () {
-                    // 3秒間ローディング
                     _loadingToFeed();
-                    // TODO ログイン処理を実装する
                   },
+                  text: 'ログイン',
+                  colors: 0xFF468300,
                 ),
               ),
               SizedBox(
@@ -163,7 +150,7 @@ class _TopPageState extends State<TopPage> {
   }
 
   void _toFeed() {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const HomePage()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const HomePage()));
   }
 }
