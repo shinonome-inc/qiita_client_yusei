@@ -228,7 +228,6 @@ class _FeedPageState extends State<FeedPage> {
               );
             } else if (!interNetConnected && model.itemsList.isEmpty) {
               return NoInternetWidget(
-                interNetConnected: interNetConnected,
                 onPressed: () async {
                   // ネットワーク接続状態を確認する
                   bool isConnected = await checkConnectivity();

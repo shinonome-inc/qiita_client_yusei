@@ -7,6 +7,7 @@ class QiitaApiService {
   final String apiUrl = 'https://qiita.com/api/v2/items';
 
   // Qiita APIのアクセストークン
+  // TODO 認証系実装時に削除する
   final String accessToken = 'b1150483b71f6070cb3f9388cb03993bc510987d';
 
   // キャッシュのための変数
