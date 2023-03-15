@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../main.dart';
+import '../util/connection_status.dart';
 import '../components/no_internet_widget.dart';
 import '../components/web_view_screen.dart';
 import '../view_model/feed_view_model.dart';
@@ -26,7 +27,7 @@ class _FeedPageState extends State<FeedPage> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      checkConnectivity().then((isConnected) async {
+      ConnectionStatus.checkConnectivity().then((isConnected) async {
         if (isConnected) {
           await feedViewModel.pullQiitaItems();
         } else {
@@ -230,7 +231,7 @@ class _FeedPageState extends State<FeedPage> {
               return NoInternetWidget(
                 onPressed: () async {
                   // ネットワーク接続状態を確認する
-                  bool isConnected = await checkConnectivity();
+                  bool isConnected = await ConnectionStatus.checkConnectivity();
                   if (isConnected) {
                     setState(() {
                       connectionStatus.interNetConnected = true;
