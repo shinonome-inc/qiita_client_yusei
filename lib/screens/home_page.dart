@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: !interNetConnected
+      appBar: !connectionStatus.interNetConnected
           ? AppBar(
         backgroundColor: Colors.white,
         shadowColor: Colors.white.withOpacity(0.3),

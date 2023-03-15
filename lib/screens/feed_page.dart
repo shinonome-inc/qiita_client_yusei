@@ -31,7 +31,7 @@ class _FeedPageState extends State<FeedPage> {
           await feedViewModel.pullQiitaItems();
         } else {
           setState(() {
-            interNetConnected = false;
+            connectionStatus.interNetConnected = false;
           });
         }
       });
@@ -154,7 +154,7 @@ class _FeedPageState extends State<FeedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: !interNetConnected
+      appBar: !connectionStatus.interNetConnected
           ? null
           : AppBar(
               backgroundColor: Colors.white,
@@ -226,20 +226,20 @@ class _FeedPageState extends State<FeedPage> {
                   color: Color(0xFF6A717D),
                 ),
               );
-            } else if (!interNetConnected && model.itemsList.isEmpty) {
+            } else if (!connectionStatus.interNetConnected && model.itemsList.isEmpty) {
               return NoInternetWidget(
                 onPressed: () async {
                   // ネットワーク接続状態を確認する
                   bool isConnected = await checkConnectivity();
                   if (isConnected) {
                     setState(() {
-                      interNetConnected = true;
+                      connectionStatus.interNetConnected = true;
                     });
                     model.pullQiitaItems();
                   } else {
                     // ネットワークに接続されていない場合はエラーメッセージを表示する
                     setState(() {
-                      interNetConnected = false;
+                      connectionStatus.interNetConnected = false;
                     });
                   }
                 },
@@ -319,7 +319,7 @@ class _FeedPageState extends State<FeedPage> {
                     visible: !(model.itemsList.isNotEmpty) &&
                         !model.isLoading &&
                         !model.firstLoading &&
-                        interNetConnected,
+                        connectionStatus.interNetConnected,
                     child: _buildNoResultWidget(),
                   ),
                 ],
@@ -334,7 +334,7 @@ class _FeedPageState extends State<FeedPage> {
   // ListViewに表示する記事がない場合に表示するWidget
 // ListViewに表示する記事がない場合に表示するWidget
   Widget _buildNoResultWidget() {
-    if (!interNetConnected && feedViewModel.itemsList.isEmpty) {
+    if (!connectionStatus.interNetConnected && feedViewModel.itemsList.isEmpty) {
       return Container();
     } else {
       return SingleChildScrollView(
