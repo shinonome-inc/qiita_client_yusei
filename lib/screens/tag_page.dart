@@ -108,49 +108,50 @@ class _TagPageState extends State<TagPage> {
                         return false;
                       },
                       child: Padding(
-                        padding: const EdgeInsets.only(left:17, right:17),
+                        padding: const EdgeInsets.only(left: 17, right: 17),
                         child: Column(
                           children: [
                             Expanded(
-
-                                child: GridView.builder(
-                                  shrinkWrap: true,
-                                  reverse: true,
-                                  itemCount: model.tags.isNotEmpty
-                                      ? model.tags.length +
-                                          (model.isLastPage ? 0 : 1)
-                                      : 1,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    if (index == model.tags.length) {
-                                      return Padding(
-                                        padding: EdgeInsets.fromLTRB(paddingLeft, 0, 0, 10),
-                                        child: SizedBox(
-                                          width:MediaQuery.of(context).size.width,
-                                          child: const Center(
-                                            child: CupertinoActivityIndicator(
-                                              radius: 18,
-                                              color: Color(0xFF6A717D),
-                                            ),
+                              child: GridView.builder(
+                                shrinkWrap: true,
+                                reverse: true,
+                                itemCount: model.tags.isNotEmpty
+                                    ? model.tags.length +
+                                        (model.isLastPage ? 0 : 1)
+                                    : 1,
+                                itemBuilder: (BuildContext context, int index) {
+                                  if (index == model.tags.length) {
+                                    return Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                          paddingLeft, 0, 0, 10),
+                                      child: SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        child: const Center(
+                                          child: CupertinoActivityIndicator(
+                                            radius: 18,
+                                            color: Color(0xFF6A717D),
                                           ),
                                         ),
-                                      );
-                                    } else {
-                                      return SizedBox(
-                                        // width: itemWidth,
-                                        // height: itemHeight,
-                                        child: TagCard(tag: model.tags[index]),
-                                      );
-                                    }
-                                  },
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                    childAspectRatio: 1.0,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 8,
-                                    crossAxisCount: crossAxisCount,
-                                  ),
+                                      ),
+                                    );
+                                  } else {
+                                    return SizedBox(
+                                      // width: itemWidth,
+                                      // height: itemHeight,
+                                      child: TagCard(tag: model.tags[index]),
+                                    );
+                                  }
+                                },
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  childAspectRatio: 1.0,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                  crossAxisCount: crossAxisCount,
                                 ),
                               ),
+                            ),
                           ],
                         ),
                       ),

@@ -68,7 +68,7 @@ class QiitaApiService {
             return newItems;
           }
         } catch (e) {
-            print('fetchQiitaItems error: $e');
+          print('fetchQiitaItems error: $e');
           return [];
         }
       }
@@ -76,11 +76,11 @@ class QiitaApiService {
     return [];
   }
 
-
   Future<List<Tag>> fetchTagList(int page, int i) async {
     // QiitaのAPIからタグ一覧を取得
     final response = await http.get(
-        Uri.parse('https://qiita.com/api/v2/tags?page=$page&per_page=20&sort=count'),
+      Uri.parse(
+          'https://qiita.com/api/v2/tags?page=$page&per_page=20&sort=count'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
@@ -105,7 +105,4 @@ class QiitaApiService {
       throw Exception('Failed to load tags');
     }
   }
-
-
-
 }

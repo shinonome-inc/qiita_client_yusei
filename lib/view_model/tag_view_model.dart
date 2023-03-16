@@ -30,8 +30,6 @@ class TagViewModel extends ChangeNotifier {
 
   int get columnCount => _columnCount;
 
-  ScrollController get scrollController => _scrollController;
-
   bool get isLastPage => _isLastPage;
 
   Future<void> fetchTags() async {
@@ -67,11 +65,5 @@ class TagViewModel extends ChangeNotifier {
       _columnCount = 4;
     }
     notifyListeners();
-  }
-
-  void handleScrollEnd() {
-    if (_scrollController.position.extentAfter == 0) {
-      fetchTags();
-    }
   }
 }
