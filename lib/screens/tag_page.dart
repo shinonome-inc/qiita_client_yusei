@@ -48,16 +48,12 @@ class _TagPageState extends State<TagPage> {
     return Scaffold(
       appBar: connectionStatus.interNetConnected
           ? null
-          : AppBar(
-              backgroundColor: Colors.white,
-              automaticallyImplyLeading: false,
-              shadowColor: Colors.white.withOpacity(0.3),
-            ),
+          : null,
       body: ChangeNotifierProvider(
         create: (_) => tagViewModel,
         child: Consumer<TagViewModel>(
           builder: (context, model, child) {
-            if (model.isLoading && model.tags.isEmpty) {
+            if (model.isLoading && model.tags.isEmpty && connectionStatus.interNetConnected) {
               //初期表示のインディケーター
               return const Center(
                 child: CupertinoActivityIndicator(
