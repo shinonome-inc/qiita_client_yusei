@@ -38,10 +38,12 @@ class _TagPageState extends State<TagPage> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    double paddingLeft = screenWidth / 2.2;
     int crossAxisCount = 2;
     if (screenWidth > 768) {
       // タブレット以上の場合は3列
       crossAxisCount = 3;
+      paddingLeft = MediaQuery.of(context).size.width / 2.1;
     }
     return Scaffold(
       appBar: connectionStatus.interNetConnected
@@ -92,7 +94,7 @@ class _TagPageState extends State<TagPage> {
                         if (!model.isLastPage &&
                             !model.isLoading &&
                             scrollInfo.metrics.pixels >=
-                                scrollInfo.metrics.maxScrollExtent + 10) {
+                                scrollInfo.metrics.maxScrollExtent + 5) {
                           model.fetchTags();
                         }
 
@@ -121,7 +123,7 @@ class _TagPageState extends State<TagPage> {
                                   itemBuilder: (BuildContext context, int index) {
                                     if (index == model.tags.length) {
                                       return Padding(
-                                        padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width / 2.2, 0, 0, 0),
+                                        padding: EdgeInsets.fromLTRB(paddingLeft, 0, 0, 10),
                                         child: SizedBox(
                                           width:MediaQuery.of(context).size.width,
                                           child: const Center(
@@ -224,54 +226,56 @@ class TagCard extends StatelessWidget {
                 );
               }
             }
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.network(
-                  tag.iconUrl,
-                  width: 38,
-                  height: 38,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  tag.name,
-                  style: const TextStyle(
-                    fontFamily: 'Noto Sans JP',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 20 / 14,
-                    letterSpacing: 0.25,
-                    color: Color(0xFF333333),
+            return SizedBox(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.network(
+                    tag.iconUrl,
+                    width: 38,
+                    height: 38,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '記事件数：${tag.itemsCount}',
-                  style: const TextStyle(
-                    fontFamily: 'Noto Sans JP',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    height: 12 / 12,
-                    letterSpacing: 0,
-                    color: Color(0xFF828282),
+                  const SizedBox(height: 8),
+                  Text(
+                    tag.name,
+                    style: const TextStyle(
+                      fontFamily: 'Noto Sans JP',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      height: 20 / 14,
+                      letterSpacing: 0.25,
+                      color: Color(0xFF333333),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  'フォロワー数：${tag.followersCount}',
-                  style: const TextStyle(
-                    fontFamily: 'Noto Sans JP',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    height: 12 / 12,
-                    letterSpacing: 0,
-                    color: Color(0xFF828282),
+                  const SizedBox(height: 8),
+                  Text(
+                    '記事件数：${tag.itemsCount}',
+                    style: const TextStyle(
+                      fontFamily: 'Noto Sans JP',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      height: 12 / 12,
+                      letterSpacing: 0,
+                      color: Color(0xFF828282),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+                  Text(
+                    'フォロワー数：${tag.followersCount}',
+                    style: const TextStyle(
+                      fontFamily: 'Noto Sans JP',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      height: 12 / 12,
+                      letterSpacing: 0,
+                      color: Color(0xFF828282),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             );
           },
         ),
