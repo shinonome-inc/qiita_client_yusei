@@ -37,8 +37,6 @@ class _TagPageState extends State<TagPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double itemHeight = MediaQuery.of(context).size.height / 2.5;
-    final double itemWidth = MediaQuery.of(context).size.width / 2;
     final screenWidth = MediaQuery.of(context).size.width;
     int crossAxisCount = 2;
     if (screenWidth > 768) {
@@ -107,60 +105,52 @@ class _TagPageState extends State<TagPage> {
                         }
                         return false;
                       },
-                      child: Column(
-                        children: [
-                          // Padding(
-                          //   padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
-                          //   child: Visibility(
-                          //     visible: model.isLoading,
-                          //     child: const Center(
-                          //       child: CupertinoActivityIndicator(
-                          //         radius: 18,
-                          //         color: Color(0xFF6A717D),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
-                          Expanded(
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              reverse: true,
-                              itemCount: model.tags.isNotEmpty
-                                  ? model.tags.length +
-                                      (model.isLastPage ? 0 : 1)
-                                  : 1,
-                              itemBuilder: (BuildContext context, int index) {
-                                if (index == model.tags.length) {
-                                  return Padding(
-                                    padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width / 2, 0, 0, 0),
-                                    child: SizedBox(
-                                      width:MediaQuery.of(context).size.width,
-                                      child: const Center(
-                                        child: CupertinoActivityIndicator(
-                                          radius: 18,
-                                          color: Color(0xFF6A717D),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left:17, right:17),
+                        child: Column(
+                          children: [
+                            Expanded(
+
+                                child: GridView.builder(
+                                  shrinkWrap: true,
+                                  reverse: true,
+                                  itemCount: model.tags.isNotEmpty
+                                      ? model.tags.length +
+                                          (model.isLastPage ? 0 : 1)
+                                      : 1,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    if (index == model.tags.length) {
+                                      return Padding(
+                                        padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width / 2.2, 0, 0, 0),
+                                        child: SizedBox(
+                                          width:MediaQuery.of(context).size.width,
+                                          child: const Center(
+                                            child: CupertinoActivityIndicator(
+                                              radius: 18,
+                                              color: Color(0xFF6A717D),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return SizedBox(
-                                    width: itemWidth,
-                                    height: itemHeight,
-                                    child: TagCard(tag: model.tags[index]),
-                                  );
-                                }
-                              },
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                childAspectRatio: 1.0,
-                                crossAxisSpacing: 3,
-                                mainAxisSpacing: 3,
-                                crossAxisCount: crossAxisCount,
+                                      );
+                                    } else {
+                                      return SizedBox(
+                                        // width: itemWidth,
+                                        // height: itemHeight,
+                                        child: TagCard(tag: model.tags[index]),
+                                      );
+                                    }
+                                  },
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    childAspectRatio: 1.0,
+                                    crossAxisSpacing: 8,
+                                    mainAxisSpacing: 8,
+                                    crossAxisCount: crossAxisCount,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -192,6 +182,13 @@ class TagCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(
+        side: const BorderSide(
+          color: Color(0xFFE0E0E0),
+          width: 1.0,
+        ),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
       child: InkWell(
         onTap: () {
           Navigator.push(
