@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TagPage extends StatefulWidget {
-  const TagPage({Key? key}) : super(key: key);
+  const TagPage({Key? key,}) : super(key: key);
 
   @override
   State<TagPage> createState() => _TagPageState();

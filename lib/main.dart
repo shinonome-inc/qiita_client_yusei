@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/screens/top_page.dart';
+import '../util/connection_status.dart';
 
-void main() => runApp(const AppBarApp());
+// インスタンスへの参照を取得
+final connectionStatus = ConnectionStatus();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  connectionStatus.interNetConnected = await ConnectionStatus.checkConnectivity();
+  runApp(const AppBarApp());
+}
 
 class AppBarApp extends StatelessWidget {
   const AppBarApp({super.key});
