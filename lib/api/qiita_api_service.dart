@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../view_model/tag_view_model.dart';
+
 class QiitaApiService {
   // Qiita APIのエンドポイントURL
   final String apiUrl = 'https://qiita.com/api/v2/items';
@@ -73,4 +75,37 @@ class QiitaApiService {
     }
     return [];
   }
+
+
+  Future<List<Tag>> fetchTagList(int page, int i) async {
+    // QiitaのAPIからタグ一覧を取得
+    final response = await http.get(
+        Uri.parse('https://qiita.com/api/v2/tags?page=$page&per_page=20&sort=count'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data == null) {
+        return [];
+      }
+      final tags = data.map<Tag>((tagData) {
+        final iconUrl = tagData['icon_url'];
+        return Tag(
+          name: tagData['id'] ?? '',
+          iconUrl: iconUrl ?? 'https://via.placeholder.com/150?text=No+Image',
+          followersCount: tagData['followers_count'] ?? 0,
+          itemsCount: tagData['items_count'] ?? 0,
+        );
+      }).toList();
+      return tags;
+    } else {
+      throw Exception('Failed to load tags');
+    }
+  }
+
+
+
 }
