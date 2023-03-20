@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../view_model/tag_view_model.dart';
+import '../model/tag.dart';
 
 class TagDetailListPage extends StatelessWidget {
   final Tag tag;

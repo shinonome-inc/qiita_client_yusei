@@ -6,6 +6,7 @@ import '../components/no_internet_widget.dart';
 import '../main.dart';
 import '../util/connection_status.dart';
 import '../view_model/tag_view_model.dart';
+import '../model/tag.dart';
 
 class TagPage extends StatefulWidget {
   const TagPage({
@@ -46,9 +47,6 @@ class _TagPageState extends State<TagPage> {
       paddingLeft = MediaQuery.of(context).size.width / 2.1;
     }
     return Scaffold(
-      appBar: connectionStatus.interNetConnected
-          ? null
-          : null,
       body: ChangeNotifierProvider(
         create: (_) => tagViewModel,
         child: Consumer<TagViewModel>(
@@ -110,7 +108,6 @@ class _TagPageState extends State<TagPage> {
                             Expanded(
                               child: GridView.builder(
                                 shrinkWrap: true,
-                                reverse: true,
                                 itemCount: model.tags.isNotEmpty
                                     ? model.tags.length +
                                         (model.isLastPage ? 0 : 1)

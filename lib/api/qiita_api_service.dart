@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-
-import '../view_model/tag_view_model.dart';
+import '../model/tag.dart';
 
 class QiitaApiService {
   // Qiita APIのエンドポイントURL

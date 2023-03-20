@@ -1,19 +1,6 @@
 import '../api/qiita_api_service.dart';
 import 'package:flutter/material.dart';
-
-class Tag {
-  final String name;
-  final String iconUrl;
-  final int followersCount;
-  final int itemsCount;
-
-  Tag({
-    required this.name,
-    required this.iconUrl,
-    required this.followersCount,
-    required this.itemsCount,
-  });
-}
+import '../model/tag.dart';
 
 class TagViewModel extends ChangeNotifier {
   final List<Tag> _tags = [];
