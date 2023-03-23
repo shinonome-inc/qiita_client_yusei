@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../components/loading_widget.dart';
 import '../main.dart';
 import '../util/connection_status.dart';
 import '../components/no_internet_widget.dart';
@@ -222,12 +222,10 @@ class _FeedPageState extends State<FeedPage> {
           builder: (context, model, child) {
             if (model.isLoading && model.itemsList.isEmpty) {
               return const Center(
-                child: CupertinoActivityIndicator(
-                  radius: 22,
-                  color: Color(0xFF6A717D),
-                ),
+                child: LoadingWidget(radius: 22.0, color: Color(0xFF6A717D)),
               );
-            } else if (!connectionStatus.interNetConnected && model.itemsList.isEmpty) {
+            } else if (!connectionStatus.interNetConnected &&
+                model.itemsList.isEmpty) {
               return NoInternetWidget(
                 onPressed: () async {
                   // ネットワーク接続状態を確認する
@@ -273,7 +271,7 @@ class _FeedPageState extends State<FeedPage> {
                           Expanded(
                             child: ListView.builder(
                               //Listの最新記事取得スクロールの方向が変わる
-                              reverse: true,
+                              // reverse: true,
                               shrinkWrap: true,
                               itemCount: model.itemsList.isNotEmpty
                                   ? model.itemsList.length +
@@ -289,10 +287,9 @@ class _FeedPageState extends State<FeedPage> {
                                     child: Padding(
                                       padding: padding,
                                       child: model.isLoading
-                                          ? const CupertinoActivityIndicator(
-                                              radius: 18,
-                                              color: Color(0xFF6A717D),
-                                            )
+                                          ? const LoadingWidget(
+                                              radius: 18.0,
+                                              color: Color(0xFF6A717D))
                                           : Container(),
                                     ),
                                   );
@@ -311,10 +308,8 @@ class _FeedPageState extends State<FeedPage> {
                   Visibility(
                       visible: model.isLoading && model.itemsList.isEmpty,
                       child: const Center(
-                        child: CupertinoActivityIndicator(
-                          radius: 22,
-                          color: Color(0xFF6A717D),
-                        ),
+                        child: LoadingWidget(
+                            radius: 22.0, color: Color(0xFF6A717D)),
                       )),
                   Visibility(
                     visible: !(model.itemsList.isNotEmpty) &&
@@ -335,7 +330,8 @@ class _FeedPageState extends State<FeedPage> {
   // ListViewに表示する記事がない場合に表示するWidget
 // ListViewに表示する記事がない場合に表示するWidget
   Widget _buildNoResultWidget() {
-    if (!connectionStatus.interNetConnected && feedViewModel.itemsList.isEmpty) {
+    if (!connectionStatus.interNetConnected &&
+        feedViewModel.itemsList.isEmpty) {
       return Container();
     } else {
       return SingleChildScrollView(
