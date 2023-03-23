@@ -6,7 +6,6 @@ class TagViewModel extends ChangeNotifier {
   final List<Tag> _tags = [];
   bool _isLoading = true;
   int _columnCount = 2;
-  final ScrollController _scrollController = ScrollController();
   final QiitaApiService _qiitaApiService = QiitaApiService();
   bool _isLastPage = false;
   final int _perPage = 20;
