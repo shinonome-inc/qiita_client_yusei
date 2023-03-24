@@ -47,22 +47,24 @@ class _ArticleDetailListBodyContentState
   void initState() {
     super.initState();
     // QiitaApiService().isMyPage = false;
-    // _feedViewModel = context.read<FeedViewModel>();
     _feedViewModel = Provider.of<FeedViewModel>(context, listen: false);
-    Future.delayed(Duration.zero, () {
-      ConnectionStatus.checkConnectivity().then((isConnected) async {
-        if (isConnected) {
-          if (widget.pageName == "feed") {
-            _feedViewModel.pullQiitaItems();
-          } else {
-            await _feedViewModel.searchQiitaItems(widget.tag!.name);
-          }
-        } else {
-          connectionStatus.interNetConnected = false;
-        }
-      });
-      // _feedViewModel.firstLoading = false;
+    Future(() async {
+      await fetchItems(_feedViewModel, widget.pageName, widget.tag);
     });
+  }
+
+  Future<void> fetchItems(
+      FeedViewModel model, String pageName, Tag? tag) async {
+    if (await ConnectionStatus.checkConnectivity()) {
+      connectionStatus.interNetConnected = true;
+      if (pageName == "tag_detail_list") {
+        await model.searchQiitaItems(tag!.name);
+      } else {
+        await model.pullQiitaItems();
+      }
+    } else {
+      connectionStatus.interNetConnected = false;
+    }
   }
 
   @override
@@ -76,17 +78,8 @@ class _ArticleDetailListBodyContentState
             model.itemsList.isEmpty) {
           content = NoInternetWidget(
             onPressed: () async {
-              bool isConnected = await ConnectionStatus.checkConnectivity();
-              if (isConnected) {
-                connectionStatus.interNetConnected = true;
-                if (widget.pageName == "feed") {
-                  model.pullQiitaItems();
-                } else {
-                  await model.searchQiitaItems(widget.tag!.name);
-                }
-              } else {
-                connectionStatus.interNetConnected = false;
-              }
+              await fetchItems(
+                  context.read<FeedViewModel>(), widget.pageName, widget.tag);
             },
           );
         } else {
@@ -105,17 +98,8 @@ class _ArticleDetailListBodyContentState
     if (!connectionStatus.interNetConnected && model.itemsList.isEmpty) {
       return NoInternetWidget(
         onPressed: () async {
-          bool isConnected = await ConnectionStatus.checkConnectivity();
-          if (isConnected) {
-            connectionStatus.interNetConnected = true;
-            if (widget.pageName == "feed") {
-              model.pullQiitaItems();
-            } else {
-              await model.searchQiitaItems(widget.tag!.name);
-            }
-          } else {
-            connectionStatus.interNetConnected = false;
-          }
+          await fetchItems(
+              context.read<FeedViewModel>(), widget.pageName, widget.tag);
         },
       );
     }

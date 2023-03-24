@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../components/custom_modal.dart';
 import '../components/loading_widget.dart';
 import '../main.dart';
 import '../util/connection_status.dart';
@@ -26,18 +27,19 @@ class _FeedPageState extends State<FeedPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      ConnectionStatus.checkConnectivity().then((isConnected) async {
-        if (isConnected) {
-          await feedViewModel.pullQiitaItems();
-        } else {
-          setState(() {
-            connectionStatus.interNetConnected = false;
-          });
-        }
-      });
-      feedViewModel.firstLoading = false;
-    });
+    checkConnectivityAndPullItems(feedViewModel: feedViewModel);
+    feedViewModel.firstLoading = false;
+  }
+
+  Future<void> checkConnectivityAndPullItems(
+      {required FeedViewModel feedViewModel}) async {
+    if (await ConnectionStatus.checkConnectivity()) {
+      connectionStatus.interNetConnected = true;
+
+      await feedViewModel.pullQiitaItems();
+    } else {
+      connectionStatus.interNetConnected = false;
+    }
   }
 
   // ListViewに表示する記事のWidgetを作成する
@@ -102,41 +104,7 @@ class _FeedPageState extends State<FeedPage> {
               ),
             ),
             onTap: () async {
-              await showModalBottomSheet(
-                backgroundColor: Colors.transparent,
-                context: context,
-                isScrollControlled: true,
-                builder: (context) => SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.9,
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(bottom: 11),
-                        alignment: Alignment.bottomCenter,
-                        height: 59,
-                        decoration: const BoxDecoration(
-                          color: Color.fromRGBO(249, 249, 249, 1),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          'Article',
-                          textAlign: TextAlign.center,
-                          style:
-                              TextStyle(fontFamily: 'Pacifico', fontSize: 17),
-                        ),
-                      ),
-                      Expanded(
-                        child: WebViewPage(
-                          urlString: item['url'],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              await customModal(context, WebViewPage(urlString: item['url']));
             },
           ),
           const Divider(
@@ -229,18 +197,7 @@ class _FeedPageState extends State<FeedPage> {
               return NoInternetWidget(
                 onPressed: () async {
                   // ネットワーク接続状態を確認する
-                  bool isConnected = await ConnectionStatus.checkConnectivity();
-                  if (isConnected) {
-                    setState(() {
-                      connectionStatus.interNetConnected = true;
-                    });
-                    model.pullQiitaItems();
-                  } else {
-                    // ネットワークに接続されていない場合はエラーメッセージを表示する
-                    setState(() {
-                      connectionStatus.interNetConnected = false;
-                    });
-                  }
+                  checkConnectivityAndPullItems(feedViewModel: feedViewModel);
                 },
               );
             } else {
