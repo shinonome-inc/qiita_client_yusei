@@ -5,7 +5,7 @@ import '../model/tag.dart';
 
 class QiitaApiService {
   // Qiita APIのエンドポイントURL
-  final String apiUrl = 'https://qiita.com/api/v2/items';
+  String apiUrl = 'https://qiita.com/api/v2/items';
 
   // Qiita APIのアクセストークン
   // TODO 認証系実装時に削除する
@@ -19,12 +19,17 @@ class QiitaApiService {
     required int perPage,
     required String searchKeyword,
     required bool isLastPage,
+    required String pageName,
   }) async {
     if (!isLastPage) {
+      if (pageName == "tag_detail_list") {
+        apiUrl = "https://qiita.com/api/v2/tags/$searchKeyword/items";
+      }
+
       String url = '$apiUrl?per_page=$perPage&page=$currentPage';
 
       // 検索キーワードがある場合、URLに追加する
-      if (searchKeyword.isNotEmpty) {
+      if (searchKeyword.isNotEmpty && pageName != "tag_detail_list") {
         url += '&query=$searchKeyword';
       }
 
@@ -44,10 +49,11 @@ class QiitaApiService {
               'Authorization': 'Bearer $accessToken',
             },
           );
+          print(url);
 
           // レスポンスをパースし、記事のリストを作成する
           final List<dynamic> newItems = json.decode(response.body);
-
+          print(newItems);
           // キャッシュに記事を追加する
           cache[url] = newItems;
 
@@ -77,6 +83,7 @@ class QiitaApiService {
 
   Future<List<Tag>> fetchTagList(int page, int i) async {
     // QiitaのAPIからタグ一覧を取得
+    // TODO currentPageを$pageに代入する
     final response = await http.get(
       Uri.parse(
           'https://qiita.com/api/v2/tags?page=$page&per_page=20&sort=count'),

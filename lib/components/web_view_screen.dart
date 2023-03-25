@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
+// TODO 4系で書き直してみる
 class WebViewPage extends StatefulWidget {
   const WebViewPage({Key? key, required this.urlString}) : super(key: key);
   final String urlString;

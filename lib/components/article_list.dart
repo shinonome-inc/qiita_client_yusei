@@ -32,9 +32,9 @@ class ArticleList extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: () async {
         if (pageName == "feed") {
-          feedViewModel.pullQiitaItems();
+          feedViewModel.pullQiitaItems(pageName);
         } else {
-          await feedViewModel.searchQiitaItems(tag!.name);
+          await feedViewModel.searchQiitaItems(tag!.name, "tag_detail_list");
         }
       },
       child: Column(

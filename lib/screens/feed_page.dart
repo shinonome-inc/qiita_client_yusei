@@ -36,7 +36,7 @@ class _FeedPageState extends State<FeedPage> {
     if (await ConnectionStatus.checkConnectivity()) {
       connectionStatus.interNetConnected = true;
 
-      await feedViewModel.pullQiitaItems();
+      await feedViewModel.pullQiitaItems('feed');
     } else {
       connectionStatus.interNetConnected = false;
     }
@@ -57,7 +57,7 @@ class _FeedPageState extends State<FeedPage> {
     return RefreshIndicator(
       onRefresh: () async {
         // スワイプ時に更新したい処理を書く
-        await feedViewModel.pullQiitaItems();
+        await feedViewModel.pullQiitaItems('feed');
       },
       child: Column(
         children: [
@@ -152,7 +152,9 @@ class _FeedPageState extends State<FeedPage> {
                     },
 
                     // 検索キーワードを更新すると同時に、記事を更新する
-                    onSubmitted: feedViewModel.handleSubmitted,
+                    onSubmitted: (String value) async {
+                      await feedViewModel.handleSubmitted(value);
+                    },
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.fromLTRB(30, 7, 0, 7),
                       hintText: 'Search',
@@ -211,14 +213,14 @@ class _FeedPageState extends State<FeedPage> {
                             !model.isLoading &&
                             scrollInfo.metrics.pixels >=
                                 scrollInfo.metrics.maxScrollExtent + 10) {
-                          model.pullQiitaItems();
+                          model.pullQiitaItems('feed');
                         }
 
                         if (Theme.of(context).platform ==
                             TargetPlatform.android) {
                           if (scrollInfo.metrics.pixels ==
                               scrollInfo.metrics.maxScrollExtent) {
-                            model.pullQiitaItems();
+                            model.pullQiitaItems('feed');
                           }
                         }
                         return false;
@@ -269,9 +271,10 @@ class _FeedPageState extends State<FeedPage> {
                             radius: 22.0, color: Color(0xFF6A717D)),
                       )),
                   Visibility(
-                    visible: !(model.itemsList.isNotEmpty) &&
+                    visible: model.itemsList.isEmpty &&
                         !model.isLoading &&
                         !model.firstLoading &&
+                        feedViewModel.searchKeyword.isNotEmpty &&
                         connectionStatus.interNetConnected,
                     child: _buildNoResultWidget(),
                   ),

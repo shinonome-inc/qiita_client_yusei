@@ -58,9 +58,9 @@ class _ArticleDetailListBodyContentState
     if (await ConnectionStatus.checkConnectivity()) {
       connectionStatus.interNetConnected = true;
       if (pageName == "tag_detail_list") {
-        await model.searchQiitaItems(tag!.name);
+        await model.searchQiitaItems(tag!.name, "tag_detail_list");
       } else {
-        await model.pullQiitaItems();
+        await model.pullQiitaItems(pageName);
       }
     } else {
       connectionStatus.interNetConnected = false;
@@ -72,19 +72,7 @@ class _ArticleDetailListBodyContentState
     return Consumer<FeedViewModel>(
       builder: (context, model, child) {
         Widget content;
-        if (model.isLoading && model.itemsList.isEmpty) {
-          content = const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D));
-        } else if (!connectionStatus.interNetConnected &&
-            model.itemsList.isEmpty) {
-          content = NoInternetWidget(
-            onPressed: () async {
-              await fetchItems(
-                  context.read<FeedViewModel>(), widget.pageName, widget.tag);
-            },
-          );
-        } else {
-          content = _buildContent(model);
-        }
+        content = _buildContent(model);
         return content;
       },
     );
@@ -113,14 +101,13 @@ class _ArticleDetailListBodyContentState
                   !model.isLoading &&
                   scrollInfo.metrics.pixels >=
                       scrollInfo.metrics.maxScrollExtent + 10) {
-                model.pullQiitaItems();
+                model.pullQiitaItems(widget.pageName);
               }
 
-              if (Theme.of(context).platform == TargetPlatform.android) {
-                if (scrollInfo.metrics.pixels ==
-                    scrollInfo.metrics.maxScrollExtent) {
-                  model.pullQiitaItems();
-                }
+              if (Theme.of(context).platform == TargetPlatform.android &&
+                  scrollInfo.metrics.atEdge &&
+                  scrollInfo.metrics.pixels > 0) {
+                model.pullQiitaItems(widget.pageName);
               }
               return false;
             },

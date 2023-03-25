@@ -8,6 +8,8 @@ class TagViewModel extends ChangeNotifier {
   int _columnCount = 2;
   final QiitaApiService _qiitaApiService = QiitaApiService();
   bool _isLastPage = false;
+
+  // TODO currentPageを追加する
   final int _perPage = 20;
 
   List<Tag> get tags => _tags;
