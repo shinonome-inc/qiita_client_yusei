@@ -25,8 +25,11 @@ class ArticleList extends StatelessWidget {
   Widget build(BuildContext context) {
     final item = feedViewModel.itemsList[index];
     final user = item['user'];
-    final formattedDate =
-        DateFormat('yyyy/MM/dd').format(DateTime.parse(item['created_at']));
+    // 日本標準時に設定
+    final formattedDate = DateFormat('yyyy/MM/dd').format(
+        DateTime.parse(item['created_at'])
+            .toUtc()
+            .add(const Duration(hours: 9)));
     final likeCount = item['likes_count'];
 
     return RefreshIndicator(

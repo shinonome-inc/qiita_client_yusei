@@ -50,8 +50,12 @@ class _FeedPageState extends State<FeedPage> {
   ) {
     final item = feedViewModel.itemsList[index];
     final user = item['user'];
-    final formattedDate =
-        DateFormat('yyyy/MM/dd').format(DateTime.parse(item['created_at']));
+    // 日本標準時に設定
+    final formattedDate = DateFormat('yyyy/MM/dd').format(
+        DateTime.parse(item['created_at'])
+            .toUtc()
+            .add(const Duration(hours: 9)));
+
     final likeCount = item['likes_count'];
 
     return RefreshIndicator(
@@ -211,17 +215,17 @@ class _FeedPageState extends State<FeedPage> {
                       onNotification: (ScrollNotification scrollInfo) {
                         if (!model.isLastPage &&
                             !model.isLoading &&
-                            scrollInfo.metrics.pixels >=
-                                scrollInfo.metrics.maxScrollExtent + 10) {
+                            ((Theme.of(context).platform ==
+                                        TargetPlatform.android &&
+                                    scrollInfo.metrics.atEdge &&
+                                    scrollInfo.metrics.pixels > 0) ||
+                                (Theme.of(context).platform ==
+                                        TargetPlatform.iOS &&
+                                    scrollInfo.metrics.pixels >=
+                                        scrollInfo.metrics.maxScrollExtent +
+                                            5))) {
                           model.pullQiitaItems('feed');
-                        }
-
-                        if (Theme.of(context).platform ==
-                            TargetPlatform.android) {
-                          if (scrollInfo.metrics.pixels ==
-                              scrollInfo.metrics.maxScrollExtent) {
-                            model.pullQiitaItems('feed');
-                          }
+                          print("${Theme.of(context).platform} scroll");
                         }
                         return false;
                       },

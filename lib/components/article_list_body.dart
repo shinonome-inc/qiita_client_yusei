@@ -99,15 +99,14 @@ class _ArticleDetailListBodyContentState
             onNotification: (ScrollNotification scrollInfo) {
               if (!model.isLastPage &&
                   !model.isLoading &&
-                  scrollInfo.metrics.pixels >=
-                      scrollInfo.metrics.maxScrollExtent + 10) {
+                  ((Theme.of(context).platform == TargetPlatform.android &&
+                          scrollInfo.metrics.atEdge &&
+                          scrollInfo.metrics.pixels > 0) ||
+                      (Theme.of(context).platform == TargetPlatform.iOS &&
+                          scrollInfo.metrics.pixels >=
+                              scrollInfo.metrics.maxScrollExtent + 5))) {
                 model.pullQiitaItems(widget.pageName);
-              }
-
-              if (Theme.of(context).platform == TargetPlatform.android &&
-                  scrollInfo.metrics.atEdge &&
-                  scrollInfo.metrics.pixels > 0) {
-                model.pullQiitaItems(widget.pageName);
+                print("${Theme.of(context).platform} scroll");
               }
               return false;
             },

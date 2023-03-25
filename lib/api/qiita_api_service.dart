@@ -26,7 +26,7 @@ class QiitaApiService {
         apiUrl = "https://qiita.com/api/v2/tags/$searchKeyword/items";
       }
 
-      String url = '$apiUrl?per_page=$perPage&page=$currentPage';
+      String url = '$apiUrl?page=$currentPage&per_page=$perPage';
 
       // 検索キーワードがある場合、URLに追加する
       if (searchKeyword.isNotEmpty && pageName != "tag_detail_list") {
@@ -53,7 +53,7 @@ class QiitaApiService {
 
           // レスポンスをパースし、記事のリストを作成する
           final List<dynamic> newItems = json.decode(response.body);
-          print(newItems);
+          // print(newItems);
           // キャッシュに記事を追加する
           cache[url] = newItems;
 
@@ -81,17 +81,17 @@ class QiitaApiService {
     return [];
   }
 
-  Future<List<Tag>> fetchTagList(int page, int i) async {
+  Future<List<Tag>> fetchTagList(int currentPage, int perPage) async {
     // QiitaのAPIからタグ一覧を取得
-    // TODO currentPageを$pageに代入する
+
     final response = await http.get(
       Uri.parse(
-          'https://qiita.com/api/v2/tags?page=$page&per_page=20&sort=count'),
+          'https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
     );
-
+    print('https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count');
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data == null) {
