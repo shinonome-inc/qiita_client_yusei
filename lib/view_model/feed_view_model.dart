@@ -14,9 +14,10 @@ class FeedViewModel extends ChangeNotifier {
   bool isLastPage = false;
   List<dynamic> itemsList = [];
   bool firstLoading = true;
+  String pageName = "";
 
   // Qiitaの記事を取得する
-  Future<void> pullQiitaItems() async {
+  Future<void> pullQiitaItems(pageName) async {
     if (!isLastPage) {
       isLoading = true;
       notifyListeners();
@@ -26,6 +27,7 @@ class FeedViewModel extends ChangeNotifier {
         perPage: perPage,
         searchKeyword: searchKeyword,
         isLastPage: isLastPage,
+        pageName: pageName,
       );
 
       if (newItems.isEmpty) {
@@ -46,17 +48,18 @@ class FeedViewModel extends ChangeNotifier {
     firstLoading = false;
   }
 
-  // TextFieldでEnterを押した時に呼ばれる
-  Future<void> searchQiitaItems(String value) async {
+  // Feedページ：TextFieldでEnterを押した時に呼ばれる
+  // Tag詳細ページ：記事を取得する時に呼ばれる
+  Future<void> searchQiitaItems(String value, String pageName) async {
     searchKeyword = value;
     firstLoading = true;
     currentPage = 1;
     isLastPage = false;
     itemsList.clear();
-    await pullQiitaItems();
+    await pullQiitaItems(pageName);
   }
 
-  // TextFieldでEnterを押した時に呼ばれる
+  // FeedページのTextFieldでEnterを押した時に呼ばれる
 
   Future<void> handleSubmitted(String value) async {
     searchKeyword = value;
@@ -64,6 +67,6 @@ class FeedViewModel extends ChangeNotifier {
     currentPage = 1;
     isLastPage = false;
     itemsList.clear();
-    await searchQiitaItems(value);
+    await searchQiitaItems(value, 'feed');
   }
 }

@@ -23,6 +23,7 @@ class _TagPageState extends State<TagPage> {
     Future(() async {
       await ConnectionStatus.checkConnectivity().then((isConnected) {
         if (isConnected) {
+          tagViewModel.firstLoading = true;
           tagViewModel.fetchTags();
         } else {
           connectionStatus.interNetConnected = false;
@@ -40,6 +41,7 @@ class _TagPageState extends State<TagPage> {
       onPressed: () async {
         if (await ConnectionStatus.checkConnectivity()) {
           connectionStatus.interNetConnected = true;
+          tagViewModel.firstLoading = true;
           tagViewModel.fetchTags();
         } else {
           connectionStatus.interNetConnected = false;
@@ -61,18 +63,17 @@ class _TagPageState extends State<TagPage> {
 
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
-        if (!model.isLastPage &&
-            !model.isLoading &&
-            scrollInfo.metrics.pixels >=
-                scrollInfo.metrics.maxScrollExtent + 5) {
+        if (!model.isLastPage && !model.isLoading &&
+            ((Theme.of(context).platform == TargetPlatform.android &&
+                scrollInfo.metrics.atEdge &&
+                scrollInfo.metrics.pixels > 0) ||
+                (Theme.of(context).platform == TargetPlatform.iOS &&
+                    scrollInfo.metrics.pixels >=
+                        scrollInfo.metrics.maxScrollExtent + 5))) {
           model.fetchTags();
+          print("${Theme.of(context).platform} scroll");
         }
 
-        if (Theme.of(context).platform == TargetPlatform.android) {
-          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-            model.fetchTags();
-          }
-        }
         return false;
       },
       child: Padding(
@@ -113,7 +114,7 @@ class _TagPageState extends State<TagPage> {
         value: tagViewModel,
         child: Consumer<TagViewModel>(
           builder: (context, model, child) {
-            if (model.isLoading &&
+            if (model.firstLoading &&
                 model.tags.isEmpty &&
                 connectionStatus.interNetConnected) {
               return _buildInitialLoadingWidget();
@@ -127,10 +128,10 @@ class _TagPageState extends State<TagPage> {
                     visible: model.tags.isNotEmpty,
                     child: _buildTagsGridView(model),
                   ),
-                  Visibility(
-                    visible: model.isLoading && model.tags.isEmpty,
-                    child: _buildInitialLoadingWidget(),
-                  ),
+                  // Visibility(
+                  //   visible: model.isLoading && model.tags.isEmpty,
+                  //   child: _buildInitialLoadingWidget(),
+                  // ),
                 ],
               );
             }

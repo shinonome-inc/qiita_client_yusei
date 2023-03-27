@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../components/custom_modal.dart';
+import '../components/loading_widget.dart';
 import '../main.dart';
 import '../util/connection_status.dart';
 import '../components/no_internet_widget.dart';
@@ -26,18 +27,19 @@ class _FeedPageState extends State<FeedPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      ConnectionStatus.checkConnectivity().then((isConnected) async {
-        if (isConnected) {
-          await feedViewModel.pullQiitaItems();
-        } else {
-          setState(() {
-            connectionStatus.interNetConnected = false;
-          });
-        }
-      });
-      feedViewModel.firstLoading = false;
-    });
+    checkConnectivityAndPullItems(feedViewModel: feedViewModel);
+    feedViewModel.firstLoading = false;
+  }
+
+  Future<void> checkConnectivityAndPullItems(
+      {required FeedViewModel feedViewModel}) async {
+    if (await ConnectionStatus.checkConnectivity()) {
+      connectionStatus.interNetConnected = true;
+
+      await feedViewModel.pullQiitaItems('feed');
+    } else {
+      connectionStatus.interNetConnected = false;
+    }
   }
 
   // ListViewに表示する記事のWidgetを作成する
@@ -48,14 +50,18 @@ class _FeedPageState extends State<FeedPage> {
   ) {
     final item = feedViewModel.itemsList[index];
     final user = item['user'];
-    final formattedDate =
-        DateFormat('yyyy/MM/dd').format(DateTime.parse(item['created_at']));
+    // 日本標準時に設定
+    final formattedDate = DateFormat('yyyy/MM/dd').format(
+        DateTime.parse(item['created_at'])
+            .toUtc()
+            .add(const Duration(hours: 9)));
+
     final likeCount = item['likes_count'];
 
     return RefreshIndicator(
       onRefresh: () async {
         // スワイプ時に更新したい処理を書く
-        await feedViewModel.pullQiitaItems();
+        await feedViewModel.pullQiitaItems('feed');
       },
       child: Column(
         children: [
@@ -102,41 +108,7 @@ class _FeedPageState extends State<FeedPage> {
               ),
             ),
             onTap: () async {
-              await showModalBottomSheet(
-                backgroundColor: Colors.transparent,
-                context: context,
-                isScrollControlled: true,
-                builder: (context) => SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.9,
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(bottom: 11),
-                        alignment: Alignment.bottomCenter,
-                        height: 59,
-                        decoration: const BoxDecoration(
-                          color: Color.fromRGBO(249, 249, 249, 1),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          'Article',
-                          textAlign: TextAlign.center,
-                          style:
-                              TextStyle(fontFamily: 'Pacifico', fontSize: 17),
-                        ),
-                      ),
-                      Expanded(
-                        child: WebViewPage(
-                          urlString: item['url'],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              await customModal(context, WebViewPage(urlString: item['url']));
             },
           ),
           const Divider(
@@ -184,7 +156,9 @@ class _FeedPageState extends State<FeedPage> {
                     },
 
                     // 検索キーワードを更新すると同時に、記事を更新する
-                    onSubmitted: feedViewModel.handleSubmitted,
+                    onSubmitted: (String value) async {
+                      await feedViewModel.handleSubmitted(value);
+                    },
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.fromLTRB(30, 7, 0, 7),
                       hintText: 'Search',
@@ -222,27 +196,14 @@ class _FeedPageState extends State<FeedPage> {
           builder: (context, model, child) {
             if (model.isLoading && model.itemsList.isEmpty) {
               return const Center(
-                child: CupertinoActivityIndicator(
-                  radius: 22,
-                  color: Color(0xFF6A717D),
-                ),
+                child: LoadingWidget(radius: 22.0, color: Color(0xFF6A717D)),
               );
-            } else if (!connectionStatus.interNetConnected && model.itemsList.isEmpty) {
+            } else if (!connectionStatus.interNetConnected &&
+                model.itemsList.isEmpty) {
               return NoInternetWidget(
                 onPressed: () async {
                   // ネットワーク接続状態を確認する
-                  bool isConnected = await ConnectionStatus.checkConnectivity();
-                  if (isConnected) {
-                    setState(() {
-                      connectionStatus.interNetConnected = true;
-                    });
-                    model.pullQiitaItems();
-                  } else {
-                    // ネットワークに接続されていない場合はエラーメッセージを表示する
-                    setState(() {
-                      connectionStatus.interNetConnected = false;
-                    });
-                  }
+                  checkConnectivityAndPullItems(feedViewModel: feedViewModel);
                 },
               );
             } else {
@@ -254,17 +215,17 @@ class _FeedPageState extends State<FeedPage> {
                       onNotification: (ScrollNotification scrollInfo) {
                         if (!model.isLastPage &&
                             !model.isLoading &&
-                            scrollInfo.metrics.pixels >=
-                                scrollInfo.metrics.maxScrollExtent + 10) {
-                          model.pullQiitaItems();
-                        }
-
-                        if (Theme.of(context).platform ==
-                            TargetPlatform.android) {
-                          if (scrollInfo.metrics.pixels ==
-                              scrollInfo.metrics.maxScrollExtent) {
-                            model.pullQiitaItems();
-                          }
+                            ((Theme.of(context).platform ==
+                                        TargetPlatform.android &&
+                                    scrollInfo.metrics.atEdge &&
+                                    scrollInfo.metrics.pixels > 0) ||
+                                (Theme.of(context).platform ==
+                                        TargetPlatform.iOS &&
+                                    scrollInfo.metrics.pixels >=
+                                        scrollInfo.metrics.maxScrollExtent +
+                                            5))) {
+                          model.pullQiitaItems('feed');
+                          print("${Theme.of(context).platform} scroll");
                         }
                         return false;
                       },
@@ -273,7 +234,7 @@ class _FeedPageState extends State<FeedPage> {
                           Expanded(
                             child: ListView.builder(
                               //Listの最新記事取得スクロールの方向が変わる
-                              reverse: true,
+                              // reverse: true,
                               shrinkWrap: true,
                               itemCount: model.itemsList.isNotEmpty
                                   ? model.itemsList.length +
@@ -289,10 +250,9 @@ class _FeedPageState extends State<FeedPage> {
                                     child: Padding(
                                       padding: padding,
                                       child: model.isLoading
-                                          ? const CupertinoActivityIndicator(
-                                              radius: 18,
-                                              color: Color(0xFF6A717D),
-                                            )
+                                          ? const LoadingWidget(
+                                              radius: 18.0,
+                                              color: Color(0xFF6A717D))
                                           : Container(),
                                     ),
                                   );
@@ -311,15 +271,14 @@ class _FeedPageState extends State<FeedPage> {
                   Visibility(
                       visible: model.isLoading && model.itemsList.isEmpty,
                       child: const Center(
-                        child: CupertinoActivityIndicator(
-                          radius: 22,
-                          color: Color(0xFF6A717D),
-                        ),
+                        child: LoadingWidget(
+                            radius: 22.0, color: Color(0xFF6A717D)),
                       )),
                   Visibility(
-                    visible: !(model.itemsList.isNotEmpty) &&
+                    visible: model.itemsList.isEmpty &&
                         !model.isLoading &&
                         !model.firstLoading &&
+                        feedViewModel.searchKeyword.isNotEmpty &&
                         connectionStatus.interNetConnected,
                     child: _buildNoResultWidget(),
                   ),
@@ -335,7 +294,8 @@ class _FeedPageState extends State<FeedPage> {
   // ListViewに表示する記事がない場合に表示するWidget
 // ListViewに表示する記事がない場合に表示するWidget
   Widget _buildNoResultWidget() {
-    if (!connectionStatus.interNetConnected && feedViewModel.itemsList.isEmpty) {
+    if (!connectionStatus.interNetConnected &&
+        feedViewModel.itemsList.isEmpty) {
       return Container();
     } else {
       return SingleChildScrollView(

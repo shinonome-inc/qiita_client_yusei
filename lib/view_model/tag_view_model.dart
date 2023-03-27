@@ -8,15 +8,25 @@ class TagViewModel extends ChangeNotifier {
   int _columnCount = 2;
   final QiitaApiService _qiitaApiService = QiitaApiService();
   bool _isLastPage = false;
+  bool _firstLoading = false;
+
+  // TODO currentPageを追加する
   final int _perPage = 20;
 
   List<Tag> get tags => _tags;
 
   bool get isLoading => _isLoading;
 
+  bool get firstLoading => _firstLoading;
+
   int get columnCount => _columnCount;
 
   bool get isLastPage => _isLastPage;
+
+  set firstLoading(bool value) {
+    _firstLoading = value;
+    notifyListeners();
+  }
 
   Future<void> fetchTags() async {
     if (_isLastPage) {
@@ -29,8 +39,7 @@ class TagViewModel extends ChangeNotifier {
     }
 
     // タグ一覧を取得
-    List<Tag> newTags = await _qiitaApiService.fetchTagList(
-        _perPage, _tags.length ~/ _perPage + 1);
+    List<Tag> newTags = await _qiitaApiService.fetchTagList(_tags.length ~/ _perPage + 1, _perPage);
 
     if (newTags.isEmpty) {
       _isLastPage = true;
@@ -39,6 +48,7 @@ class TagViewModel extends ChangeNotifier {
     // 取得したタグを既存のタグリストに追加
     _tags.addAll(newTags);
     _isLoading = false;
+    _firstLoading = false;
     notifyListeners();
   }
 
