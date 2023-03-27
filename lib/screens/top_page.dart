@@ -50,7 +50,6 @@ class _TopPageState extends State<TopPage> {
             fit: BoxFit.cover,
             image: const AssetImage('assets/images/背景画像.png'),
           )),
-          // padding: const EdgeInsets.only(top: 220),
           alignment: Alignment.center,
 
           child: Column(

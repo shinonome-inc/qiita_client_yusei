@@ -5,8 +5,6 @@ import 'package:flutter_app/model/tag.dart';
 import 'package:flutter_app/util/connection_status.dart';
 import 'package:flutter_app/view_model/feed_view_model.dart';
 import 'package:provider/provider.dart';
-
-// import '../api/qiita_api_service.dart';
 import '../main.dart';
 import 'loading_widget.dart';
 
@@ -21,32 +19,31 @@ class ArticleDetailListBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => FeedViewModel(),
-      child: _ArticleDetailListBodyContent(tag: tag, pageName: pageName),
+      child: ArticleDetailListBodyContent(tag: tag, pageName: pageName),
     );
   }
 }
 
-class _ArticleDetailListBodyContent extends StatefulWidget {
+class ArticleDetailListBodyContent extends StatefulWidget {
   final Tag? tag;
   final String pageName;
 
-  const _ArticleDetailListBodyContent(
+  const ArticleDetailListBodyContent(
       {Key? key, this.tag, required this.pageName})
       : super(key: key);
 
   @override
-  State<_ArticleDetailListBodyContent> createState() =>
-      _ArticleDetailListBodyContentState();
+  State<ArticleDetailListBodyContent> createState() =>
+      ArticleDetailListBodyContentState();
 }
 
-class _ArticleDetailListBodyContentState
-    extends State<_ArticleDetailListBodyContent> {
+class ArticleDetailListBodyContentState
+    extends State<ArticleDetailListBodyContent> {
   late final FeedViewModel _feedViewModel;
 
   @override
   void initState() {
     super.initState();
-    // QiitaApiService().isMyPage = false;
     _feedViewModel = Provider.of<FeedViewModel>(context, listen: false);
     Future(() async {
       await fetchItems(_feedViewModel, widget.pageName, widget.tag);
@@ -100,8 +97,8 @@ class _ArticleDetailListBodyContentState
               if (!model.isLastPage &&
                   !model.isLoading &&
                   ((Theme.of(context).platform == TargetPlatform.android &&
-                          scrollInfo.metrics.atEdge &&
-                          scrollInfo.metrics.pixels > 0) ||
+                      scrollInfo.metrics.atEdge &&
+                      scrollInfo.metrics.pixels > 0) ||
                       (Theme.of(context).platform == TargetPlatform.iOS &&
                           scrollInfo.metrics.pixels >=
                               scrollInfo.metrics.maxScrollExtent + 5))) {
@@ -139,16 +136,16 @@ class _ArticleDetailListBodyContentState
                         : 1,
                     itemBuilder: (BuildContext context, int index) {
                       final padding =
-                          Theme.of(context).platform == TargetPlatform.android
-                              ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
-                              : const EdgeInsets.fromLTRB(0, 10, 0, 20);
+                      Theme.of(context).platform == TargetPlatform.android
+                          ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
+                          : const EdgeInsets.fromLTRB(0, 10, 0, 20);
                       if (index == model.itemsList.length) {
                         return Center(
                           child: Padding(
                             padding: padding,
                             child: model.isLoading
                                 ? const LoadingWidget(
-                                    radius: 18.0, color: Color(0xFF6A717D))
+                                radius: 18.0, color: Color(0xFF6A717D))
                                 : Container(),
                           ),
                         );

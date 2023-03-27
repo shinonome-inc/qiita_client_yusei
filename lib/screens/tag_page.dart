@@ -128,10 +128,6 @@ class _TagPageState extends State<TagPage> {
                     visible: model.tags.isNotEmpty,
                     child: _buildTagsGridView(model),
                   ),
-                  // Visibility(
-                  //   visible: model.isLoading && model.tags.isEmpty,
-                  //   child: _buildInitialLoadingWidget(),
-                  // ),
                 ],
               );
             }
