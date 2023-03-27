@@ -29,7 +29,7 @@ class QiitaApiService {
       String url = '$apiUrl?page=$currentPage&per_page=$perPage';
 
       // 検索キーワードがある場合、URLに追加する
-      if (searchKeyword.isNotEmpty && pageName != "tag_detail_list") {
+      if (searchKeyword.isNotEmpty && pageName == "feed") {
         url += '&query=$searchKeyword';
       }
 
