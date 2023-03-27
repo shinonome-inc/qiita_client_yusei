@@ -1,9 +1,10 @@
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/components/custom_btn.dart';
 import 'package:flutter_app/screens/home_page.dart';
+
+import '../main.dart';
 
 class TopPage extends StatefulWidget {
   const TopPage({Key? key}) : super(key: key);
@@ -51,7 +52,6 @@ class _TopPageState extends State<TopPage> {
             image: const AssetImage('assets/images/背景画像.png'),
           )),
           alignment: Alignment.center,
-
           child: Column(
             children: [
               SizedBox(
@@ -86,6 +86,8 @@ class _TopPageState extends State<TopPage> {
                 child: CustomButton(
                   btnLoading: false,
                   onPressed: () {
+                    //アクセストークンを設定  TODO 認証系実装時に削除する
+                    accessToken = '3341b23482c9b4df03fad426ae9a153bebaacb02';
                     _loadingToFeed();
                   },
                   text: 'ログイン',
@@ -98,6 +100,8 @@ class _TopPageState extends State<TopPage> {
                 child: Center(
                   child: TextButton(
                     onPressed: () {
+                      //アクセストークンを空文字に設定
+                      accessToken = '';
                       _toFeed();
                     },
                     child: const Text(

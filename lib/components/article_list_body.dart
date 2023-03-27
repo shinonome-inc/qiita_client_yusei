@@ -6,7 +6,9 @@ import 'package:flutter_app/util/connection_status.dart';
 import 'package:flutter_app/view_model/feed_view_model.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
+import '../view_model/my_page_view_model.dart';
 import 'loading_widget.dart';
+import 'my_page_profile.dart';
 
 class ArticleDetailListBody extends StatelessWidget {
   final Tag? tag;
@@ -40,11 +42,13 @@ class ArticleDetailListBodyContent extends StatefulWidget {
 class ArticleDetailListBodyContentState
     extends State<ArticleDetailListBodyContent> {
   late final FeedViewModel _feedViewModel;
+  final MyPageViewModel myPageViewModel = MyPageViewModel();
 
   @override
   void initState() {
     super.initState();
     _feedViewModel = Provider.of<FeedViewModel>(context, listen: false);
+
     Future(() async {
       await fetchItems(_feedViewModel, widget.pageName, widget.tag);
     });
@@ -57,6 +61,9 @@ class ArticleDetailListBodyContentState
       if (pageName == "tag_detail_list") {
         await model.searchQiitaItems(tag!.name, "tag_detail_list");
       } else {
+        if (pageName == "my_page") {
+          await myPageViewModel.fetchUser();
+        }
         await model.pullQiitaItems(pageName);
       }
     } else {
@@ -89,6 +96,9 @@ class ArticleDetailListBodyContentState
       );
     }
 
+    final deviceHeight = MediaQuery.of(context).size.height;
+    final deviceWidth = MediaQuery.of(context).size.width;
+
     return Stack(
       children: [
         if (model.itemsList.isNotEmpty)
@@ -97,8 +107,8 @@ class ArticleDetailListBodyContentState
               if (!model.isLastPage &&
                   !model.isLoading &&
                   ((Theme.of(context).platform == TargetPlatform.android &&
-                      scrollInfo.metrics.atEdge &&
-                      scrollInfo.metrics.pixels > 0) ||
+                          scrollInfo.metrics.atEdge &&
+                          scrollInfo.metrics.pixels > 0) ||
                       (Theme.of(context).platform == TargetPlatform.iOS &&
                           scrollInfo.metrics.pixels >=
                               scrollInfo.metrics.maxScrollExtent + 5))) {
@@ -110,8 +120,18 @@ class ArticleDetailListBodyContentState
             child: Column(
               children: [
                 Visibility(
-                  //タグ詳細ページでのみ表示
-                  visible: widget.pageName == "tag_detail_list",
+                  //マイページでのみ表示
+                  visible: widget.pageName == "my_page",
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxWidth: deviceWidth, maxHeight: deviceHeight * 0.28),
+                    child: MyPageProfile(model: myPageViewModel),
+                  ),
+                ),
+                Visibility(
+                  //タグ詳細ページと、マイページでのみ表示
+                  visible: widget.pageName == "tag_detail_list" ||
+                      widget.pageName == "my_page",
                   child: Container(
                     color: const Color(0xFFf2f2f2),
                     alignment: Alignment.centerLeft,
@@ -136,16 +156,16 @@ class ArticleDetailListBodyContentState
                         : 1,
                     itemBuilder: (BuildContext context, int index) {
                       final padding =
-                      Theme.of(context).platform == TargetPlatform.android
-                          ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
-                          : const EdgeInsets.fromLTRB(0, 10, 0, 20);
+                          Theme.of(context).platform == TargetPlatform.android
+                              ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
+                              : const EdgeInsets.fromLTRB(0, 10, 0, 20);
                       if (index == model.itemsList.length) {
                         return Center(
                           child: Padding(
                             padding: padding,
                             child: model.isLoading
                                 ? const LoadingWidget(
-                                radius: 18.0, color: Color(0xFF6A717D))
+                                    radius: 18.0, color: Color(0xFF6A717D))
                                 : Container(),
                           ),
                         );

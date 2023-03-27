@@ -5,6 +5,9 @@ import '../util/connection_status.dart';
 // インスタンスへの参照を取得
 final connectionStatus = ConnectionStatus();
 
+// Qiita APIのアクセストークン
+late String accessToken;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   connectionStatus.interNetConnected = await ConnectionStatus.checkConnectivity();
