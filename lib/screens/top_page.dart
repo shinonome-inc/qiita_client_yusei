@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/components/custom_btn.dart';
 import 'package:flutter_app/screens/home_page.dart';
-
 import '../main.dart';
 
 class TopPage extends StatefulWidget {
@@ -85,9 +84,12 @@ class _TopPageState extends State<TopPage> {
                 height: deviceHeight * 0.07,
                 child: CustomButton(
                   btnLoading: false,
-                  onPressed: () {
+                  onPressed: () async {
                     //アクセストークンを設定  TODO 認証系実装時に削除する
-                    accessToken = '3341b23482c9b4df03fad426ae9a153bebaacb02';
+                    const token = '3341b23482c9b4df03fad426ae9a153bebaacb02';
+
+                    // アクセストークンを保存する
+                    await saveAccessToken(token);
                     _loadingToFeed();
                   },
                   text: 'ログイン',
@@ -99,9 +101,9 @@ class _TopPageState extends State<TopPage> {
                 height: deviceHeight * 0.1,
                 child: Center(
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       //アクセストークンを空文字に設定
-                      accessToken = '';
+                      await saveAccessToken('');
                       _toFeed();
                     },
                     child: const Text(
@@ -137,17 +139,17 @@ class _TopPageState extends State<TopPage> {
     );
   }
 
-  void _loadingToFeed() {
+  Future<void> _loadingToFeed() async {
     setState(() {
       isLoading = true;
       imageOpacity = 0.3;
-      //3秒間のローディングアニメーションを追加
-      Future.delayed(const Duration(seconds: 3), () {
-        setState(() {
-          isLoading = false;
-          imageOpacity = 0.2;
-          _toFeed();
-        });
+    });
+    //3秒間のローディングアニメーションを追加
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        isLoading = false;
+        imageOpacity = 0.2;
+        _toFeed();
       });
     });
   }
