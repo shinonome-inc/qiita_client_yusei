@@ -27,7 +27,8 @@ class _MyPageState extends State<MyPage> {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     // TODO アクセストークンが取得できてないときは表示しない
-    if (accessToken != '') {
+    print(accessToken);
+    if (!connectionStatus.interNetConnected || accessToken != '') {
       //ログイン時に表示するWidget
       return ChangeNotifierProvider(
           create: (_) => feedViewModel,
