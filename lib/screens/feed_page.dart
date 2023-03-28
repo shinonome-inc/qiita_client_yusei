@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../components/article_list_body.dart';
 import '../main.dart';
 import '../view_model/feed_view_model.dart';
+import '../model/page_name.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({
@@ -86,8 +87,8 @@ class _FeedPageState extends State<FeedPage> {
             ),
       body: ChangeNotifierProvider(
           create: (_) => feedViewModel,
-          child:
-              const ArticleDetailListBodyContent(tag: null, pageName: 'feed')),
+          child: const ArticleDetailListBodyContent(
+              tag: null, pageName: PageName.feed)),
     );
   }
 }

@@ -9,10 +9,11 @@ import '../main.dart';
 import '../view_model/my_page_view_model.dart';
 import 'loading_widget.dart';
 import 'my_page_profile.dart';
+import '../model/page_name.dart';
 
 class ArticleDetailListBody extends StatelessWidget {
   final Tag? tag;
-  final String pageName;
+  final PageName pageName;
 
   const ArticleDetailListBody({Key? key, this.tag, required this.pageName})
       : super(key: key);
@@ -28,7 +29,7 @@ class ArticleDetailListBody extends StatelessWidget {
 
 class ArticleDetailListBodyContent extends StatefulWidget {
   final Tag? tag;
-  final String pageName;
+  final PageName pageName;
 
   const ArticleDetailListBodyContent(
       {Key? key, this.tag, required this.pageName})
@@ -55,13 +56,13 @@ class ArticleDetailListBodyContentState
   }
 
   Future<void> fetchItems(
-      FeedViewModel model, String pageName, Tag? tag) async {
+      FeedViewModel model, PageName pageName, Tag? tag) async {
     if (await ConnectionStatus.checkConnectivity()) {
       connectionStatus.interNetConnected = true;
-      if (pageName == "tag_detail_list") {
-        await model.searchQiitaItems(tag!.name, "tag_detail_list");
+      if (pageName == PageName.tagDetailList) {
+        await model.searchQiitaItems(tag!.name, PageName.tagDetailList);
       } else {
-        if (pageName == "my_page") {
+        if (pageName == PageName.myPage) {
           await myPageViewModel.fetchUser();
         }
         await model.pullQiitaItems(pageName);
@@ -121,7 +122,7 @@ class ArticleDetailListBodyContentState
               children: [
                 Visibility(
                   //マイページでのみ表示
-                  visible: widget.pageName == "my_page",
+                  visible: widget.pageName == PageName.myPage,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                         maxWidth: deviceWidth, maxHeight: deviceHeight * 0.28),
@@ -130,8 +131,8 @@ class ArticleDetailListBodyContentState
                 ),
                 Visibility(
                   //タグ詳細ページと、マイページでのみ表示
-                  visible: widget.pageName == "tag_detail_list" ||
-                      widget.pageName == "my_page",
+                  visible: widget.pageName == PageName.tagDetailList ||
+                      widget.pageName == PageName.myPage,
                   child: Container(
                     color: const Color(0xFFf2f2f2),
                     alignment: Alignment.centerLeft,
@@ -184,7 +185,7 @@ class ArticleDetailListBodyContentState
               ],
             ),
           ),
-        if (widget.pageName == "feed" &&
+        if (widget.pageName == PageName.feed &&
             !(model.itemsList.isNotEmpty) &&
             !model.isLoading &&
             !model.firstLoading &&

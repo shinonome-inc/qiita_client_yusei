@@ -6,6 +6,7 @@ import '../components/article_list_body.dart';
 import '../main.dart';
 import '../components/custom_btn.dart';
 import '../view_model/feed_view_model.dart';
+import '../model/page_name.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({
@@ -31,7 +32,7 @@ class _MyPageState extends State<MyPage> {
       return ChangeNotifierProvider(
           create: (_) => feedViewModel,
           child: const ArticleDetailListBodyContent(
-              tag: null, pageName: 'my_page'));
+              tag: null, pageName: PageName.myPage));
     } else {
       // TODO ログインしていない場合に表示するように設定する
       return Center(

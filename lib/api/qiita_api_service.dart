@@ -5,11 +5,9 @@ import 'package:http/http.dart' as http;
 import '../main.dart';
 import '../model/user.dart';
 import '../model/tag.dart';
+import '../model/page_name.dart';
 
 class QiitaApiService {
-  // Qiita APIのエンドポイントURL
-  String apiUrl = 'https://qiita.com/api/v2/items';
-
   // キャッシュのための変数
   final Map<String, dynamic> cache = {};
 
@@ -18,19 +16,26 @@ class QiitaApiService {
     required int perPage,
     required String searchKeyword,
     required bool isLastPage,
-    required String pageName,
+    required PageName pageName,
   }) async {
     if (!isLastPage) {
-      if (pageName == "tag_detail_list") {
-        apiUrl = "https://qiita.com/api/v2/tags/$searchKeyword/items";
-      } else if (pageName == "my_page") {
-        apiUrl = "https://qiita.com/api/v2/authenticated_user/items";
+      // Qiita APIのエンドポイントURL
+      String apiUrl = '';
+      switch (pageName) {
+        case PageName.feed:
+          apiUrl = 'https://qiita.com/api/v2/items';
+          break;
+        case PageName.tagDetailList:
+          apiUrl = 'https://qiita.com/api/v2/tags/$searchKeyword/items';
+          break;
+        case PageName.myPage:
+          apiUrl = 'https://qiita.com/api/v2/authenticated_user/items';
+          break;
       }
-
       String url = '$apiUrl?page=$currentPage&per_page=$perPage';
 
       // 検索キーワードがある場合、URLに追加する
-      if (searchKeyword.isNotEmpty && pageName == "feed") {
+      if (searchKeyword.isNotEmpty && pageName == PageName.feed) {
         url += '&query=$searchKeyword';
       }
 
@@ -46,18 +51,15 @@ class QiitaApiService {
           late http.Response response;
 
           // Qiita APIにリクエストを送信する
-          if (accessToken != '') {
-            response = await http.get(
-              Uri.parse(url),
-              headers: {
-                'Authorization': 'Bearer $accessToken',
-              },
-            );
-          } else {
-            response = await http.get(
-              Uri.parse(url),
-            );
-          }
+          response = await http.get(
+            Uri.parse(url),
+            headers: (accessToken != '')
+                ? {
+                    'Authorization': 'Bearer $accessToken',
+                  }
+                : null,
+          );
+
           // レスポンスをパースし、記事のリストを作成する
           final List<dynamic> newItems = json.decode(response.body);
           print(url);
@@ -95,20 +97,15 @@ class QiitaApiService {
 
     late http.Response response;
 
-    if (accessToken != '') {
-      response = await http.get(
-        Uri.parse(
-            'https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count'),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
-      );
-    } else {
-      response = await http.get(
-        Uri.parse(
-            'https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count'),
-      );
-    }
+    response = await http.get(
+      Uri.parse(
+          'https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count'),
+      headers: (accessToken != '')
+          ? {
+              'Authorization': 'Bearer $accessToken',
+            }
+          : null,
+    );
     print(
         'https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count');
     if (response.statusCode == 200) {
@@ -136,16 +133,17 @@ class QiitaApiService {
 
     late Response response;
     final dio = Dio();
-    if (accessToken != '') {
-      response = await dio.get(
-        'https://qiita.com/api/v2/authenticated_user',
-        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
-      );
-    } else {
-      response = await dio.get(
-        'https://qiita.com/api/v2/authenticated_user',
-      );
-    }
+
+    response = await dio.get(
+      'https://qiita.com/api/v2/authenticated_user',
+      options: Options(
+        headers: (accessToken != '')
+            ? {
+                'Authorization': 'Bearer $accessToken',
+              }
+            : null,
+      ),
+    );
 
     print("##### Current User Data #####");
     print("");
