@@ -5,13 +5,14 @@ import '../model/tag.dart';
 import '../view_model/feed_view_model.dart';
 import '../components/web_view_screen.dart';
 import '../components/custom_modal.dart';
+import '../model/page_name.dart';
 
 class ArticleList extends StatelessWidget {
   final FeedViewModel feedViewModel;
   final Tag? tag;
   final List<dynamic> itemsList;
   final int index;
-  final String pageName;
+  final PageName pageName;
 
   const ArticleList(
       {super.key,
@@ -34,10 +35,13 @@ class ArticleList extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        if (pageName == "feed") {
+        if (pageName == PageName.feed || pageName == PageName.myPage) {
           feedViewModel.pullQiitaItems(pageName);
+        } else if(pageName == PageName.tagDetailList){
+          await feedViewModel.searchQiitaItems(tag!.name, PageName.tagDetailList);
         } else {
-          await feedViewModel.searchQiitaItems(tag!.name, "tag_detail_list");
+          print("PageNameが正しく設定されていません");
+          return;
         }
       },
       child: Column(

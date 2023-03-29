@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_app/api/qiita_api_service.dart';
+import '../model/page_name.dart';
 
 class FeedViewModel extends ChangeNotifier {
   final QiitaApiService _qiitaApiService = QiitaApiService();
@@ -14,7 +15,7 @@ class FeedViewModel extends ChangeNotifier {
   bool isLastPage = false;
   List<dynamic> itemsList = [];
   bool firstLoading = true;
-  String pageName = "";
+  late PageName pageName;
 
   // Qiitaの記事を取得する
   Future<void> pullQiitaItems(pageName) async {
@@ -50,7 +51,7 @@ class FeedViewModel extends ChangeNotifier {
 
   // Feedページ：TextFieldでEnterを押した時に呼ばれる
   // Tag詳細ページ：記事を取得する時に呼ばれる
-  Future<void> searchQiitaItems(String value, String pageName) async {
+  Future<void> searchQiitaItems(String value, PageName pageName) async {
     searchKeyword = value;
     firstLoading = true;
     currentPage = 1;
@@ -67,6 +68,6 @@ class FeedViewModel extends ChangeNotifier {
     currentPage = 1;
     isLastPage = false;
     itemsList.clear();
-    await searchQiitaItems(value, 'feed');
+    await searchQiitaItems(value, PageName.feed);
   }
 }

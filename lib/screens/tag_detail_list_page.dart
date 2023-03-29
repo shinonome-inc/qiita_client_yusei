@@ -3,6 +3,7 @@ import '../components/article_list_body.dart';
 import '../main.dart';
 import '../model/tag.dart';
 import '../view_model/feed_view_model.dart';
+import '../model/page_name.dart';
 
 class TagDetailListPage extends StatefulWidget {
   final Tag tag;
@@ -38,7 +39,7 @@ class _TagDetailListPageState extends State<TagDetailListPage> {
               ),
         body: ArticleDetailListBody(
           tag: widget.tag,
-          pageName: 'tag_detail_list',
+          pageName: PageName.tagDetailList,
         ));
   }
 }
