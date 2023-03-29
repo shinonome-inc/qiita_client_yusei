@@ -144,14 +144,22 @@ class _TopPageState extends State<TopPage> {
       isLoading = true;
       imageOpacity = 0.3;
     });
-    //3秒間のローディングアニメーションを追加
-    Future.delayed(const Duration(seconds: 3), () {
+
+    if (accessToken != '') {
+      Future.delayed(
+          const Duration(seconds: 1),
+          () => setState(() {
+                isLoading = false;
+                imageOpacity = 0.2;
+                _toFeed();
+              }));
+    } else {
       setState(() {
         isLoading = false;
         imageOpacity = 0.2;
-        _toFeed();
       });
-    });
+      print("アクセストークンの取得に失敗しました");
+    }
   }
 
   void _toFeed() {

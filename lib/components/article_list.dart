@@ -35,7 +35,7 @@ class ArticleList extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        if (pageName == PageName.feed && pageName == PageName.myPage) {
+        if (pageName == PageName.feed || pageName == PageName.myPage) {
           feedViewModel.pullQiitaItems(pageName);
         } else if(pageName == PageName.tagDetailList){
           await feedViewModel.searchQiitaItems(tag!.name, PageName.tagDetailList);
