@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-Future<void> customModal(BuildContext context, Widget child) async {
+Future<void> customModal(BuildContext context, Widget child, {String title = 'Article'}) async {
   await showModalBottomSheet(
     backgroundColor: Colors.transparent,
     context: context,
     isScrollControlled: true,
+
     builder: (context) => SizedBox(
       height: MediaQuery.of(context).size.height * 0.9,
       child: Column(
@@ -20,10 +21,10 @@ Future<void> customModal(BuildContext context, Widget child) async {
                 topRight: Radius.circular(10),
               ),
             ),
-            child: const Text(
-              'Article',
+            child: Text(
+              title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: 'Pacifico', fontSize: 17),
+              style: const TextStyle(fontFamily: 'Pacifico', fontSize: 17),
             ),
           ),
           Expanded(child: child),

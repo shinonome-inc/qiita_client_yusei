@@ -123,27 +123,34 @@ class ArticleDetailListBodyContentState
                 Visibility(
                   //マイページでのみ表示
                   visible: widget.pageName == PageName.myPage,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                        maxWidth: deviceWidth, maxHeight: deviceHeight * 0.28),
-                    child: MyPageProfile(model: myPageViewModel),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                          height: deviceHeight * 0.313,
+                          child: MyPageProfile(model: myPageViewModel)),
+                      const SizedBox(height: 8,)
+                    ],
+
                   ),
                 ),
                 Visibility(
                   //タグ詳細ページと、マイページでのみ表示
                   visible: widget.pageName == PageName.tagDetailList ||
                       widget.pageName == PageName.myPage,
-                  child: Container(
-                    color: const Color(0xFFf2f2f2),
-                    alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(0),
                     child: Container(
-                      margin: const EdgeInsets.only(
-                          left: 12.0, top: 8.0, bottom: 8.0),
-                      child: const Text(
-                        '投稿記事',
-                        style: TextStyle(
-                          fontSize: 12.0,
-                          color: Color(0xFF828282),
+                      color: const Color(0xFFf2f2f2),
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                            left: 12.0, top: 8.0, bottom: 8.0),
+                        child: const Text(
+                          '投稿記事',
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            color: Color(0xFF828282),
+                          ),
                         ),
                       ),
                     ),

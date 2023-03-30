@@ -26,7 +26,7 @@ class _MyPageState extends State<MyPage> {
     final deviceHeight = MediaQuery.of(context).size.height;
     final deviceWidth = MediaQuery.of(context).size.width;
 
-    // TODO アクセストークンが取得できてないときは表示しない
+    // アクセストークンが取得できてないときは表示しない
     print(accessToken);
     if (!connectionStatus.interNetConnected || accessToken != '') {
       //ログイン時に表示するWidget
@@ -35,11 +35,13 @@ class _MyPageState extends State<MyPage> {
           child: const ArticleDetailListBodyContent(
               tag: null, pageName: PageName.myPage));
     } else {
-      // TODO ログインしていない場合に表示するように設定する
+      // ログインしていない場合に表示する
       return Center(
         child: Column(
           children: [
-            SizedBox(height: deviceHeight * 0.267,),
+            SizedBox(
+              height: deviceHeight * 0.267,
+            ),
             const Text(
               'ログインが必要です',
               textAlign: TextAlign.center,
@@ -62,7 +64,7 @@ class _MyPageState extends State<MyPage> {
                 height: 2,
               ),
             ),
-            SizedBox(height: deviceHeight * 0.3),
+            SizedBox(height: deviceHeight * 0.28),
             SizedBox(
               width: deviceWidth * 0.85,
               height: deviceHeight * 0.07,
@@ -70,10 +72,8 @@ class _MyPageState extends State<MyPage> {
                 btnLoading: true,
                 onPressed: () async {
                   //ログイン画面（トップ画面）へ遷移
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const TopPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const TopPage()));
                 },
                 text: 'ログインする',
                 colors: 0xFF74C13A,

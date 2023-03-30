@@ -18,7 +18,7 @@ class MyPageProfile extends StatelessWidget {
           child: Consumer<MyPageViewModel>(builder: (context, model, child) {
             if (model.isLoading) {
               return const Center(
-                child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
               );
             } else if (model.errorMessage.isNotEmpty) {
               return Center(
@@ -34,7 +34,7 @@ class MyPageProfile extends StatelessWidget {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 20, 0, 20),
+                    padding: const EdgeInsets.fromLTRB(24, 60, 0, 20),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: CachedNetworkImage(
@@ -71,7 +71,8 @@ class MyPageProfile extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 14,
                                 letterSpacing: 0.25,
-                                color: Color(0xFF333333)),
+                                color: Color(0xFF333333)
+                                ),
                           ),
                         ),
                         Padding(
@@ -91,7 +92,8 @@ class MyPageProfile extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 16.0, bottom: 16),
                           child: SizedBox(
                             width: deviceWidth,
-                            child: Text(model.description,
+                            child: Text(model.description ,
+                                maxLines: 3,
                                 style: const TextStyle(
                                     fontFamily: 'Noto Sans JP',
                                     fontWeight: FontWeight.w500,
@@ -101,6 +103,7 @@ class MyPageProfile extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
+                          height: 12,
                           child: Row(
                             children: [
                               TextButton(
@@ -119,6 +122,7 @@ class MyPageProfile extends StatelessWidget {
                                     fontSize: 12,
                                     letterSpacing: 0.25,
                                     color: Color(0xFF828282),
+                                    height: 1,
                                   ),
                                 ),
                               ),
@@ -141,6 +145,7 @@ class MyPageProfile extends StatelessWidget {
                                       fontSize: 12,
                                       letterSpacing: 0.25,
                                       color: Color(0xFF828282),
+                                      height: 1,
                                     ),
                                   ),
                                 ),

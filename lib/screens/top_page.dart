@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/components/custom_btn.dart';
 import 'package:flutter_app/screens/home_page.dart';
+import '../components/custom_modal.dart';
+import '../components/web_view_screen.dart';
 import '../main.dart';
 
 class TopPage extends StatefulWidget {
@@ -15,6 +17,7 @@ class TopPage extends StatefulWidget {
 class _TopPageState extends State<TopPage> {
   bool isLoading = false;
   double imageOpacity = 0.2;
+  late String result = "";
 
   @override
   Widget build(BuildContext context) {
@@ -39,131 +42,133 @@ class _TopPageState extends State<TopPage> {
     }
 
     return Scaffold(
-      body: Stack(children: [
-        Container(
-          decoration: BoxDecoration(
-              image: DecorationImage(
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(imageOpacity),
-              BlendMode.srcATop,
-            ),
-            fit: BoxFit.cover,
-            image: const AssetImage('assets/images/背景画像.png'),
-          )),
-          alignment: Alignment.center,
-          child: Column(
-            children: [
-              SizedBox(
-                height: deviceHeight * 0.23,
+      body: SingleChildScrollView(
+        child: Stack(children: [
+          Container(
+            height: size.height,
+            decoration: BoxDecoration(
+                image: DecorationImage(
+              colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(imageOpacity),
+                BlendMode.srcATop,
               ),
-              const Text(
-                'Qiita Feed App',
-                style: TextStyle(
-                  fontFamily: 'Pacifico',
-                  fontSize: 36.0,
-                  color: Color(0xFFFFFFFF),
+              fit: BoxFit.cover,
+              image: const AssetImage('assets/images/背景画像.png'),
+            )),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: deviceHeight * 0.23,
                 ),
-              ),
-              const SizedBox(
-                height: 14,
-              ),
-              const Text(
-                '-PlayGround-',
-                style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w700,
+                const Text(
+                  'Qiita Feed App',
+                  style: TextStyle(
+                    fontFamily: 'Pacifico',
+                    fontSize: 36.0,
                     color: Color(0xFFFFFFFF),
-                    letterSpacing: 0.25,
-                    height: 1),
-              ),
-              SizedBox(
-                height: deviceHeight * 0.45,
-              ),
-              SizedBox(
-                width: deviceWidth * 0.85,
-                height: deviceHeight * 0.07,
-                child: CustomButton(
-                  btnLoading: false,
-                  onPressed: () async {
-                    //アクセストークンを設定  TODO 認証系実装時に削除する
-                    const token = '3341b23482c9b4df03fad426ae9a153bebaacb02';
-
-                    // アクセストークンを保存する
-                    await saveAccessToken(token);
-                    _loadingToFeed();
-                  },
-                  text: 'ログイン',
-                  colors: 0xFF468300,
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: deviceWidth,
-                height: deviceHeight * 0.1,
-                child: Center(
-                  child: TextButton(
+                const SizedBox(
+                  height: 14,
+                ),
+                const Text(
+                  '-PlayGround-',
+                  style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFFFFFFF),
+                      letterSpacing: 0.25,
+                      height: 1),
+                ),
+                SizedBox(
+                  height: deviceHeight * 0.45,
+                ),
+                SizedBox(
+                  width: deviceWidth * 0.85,
+                  height: deviceHeight * 0.07,
+                  child: CustomButton(
+                    btnLoading: false,
                     onPressed: () async {
-                      //アクセストークンを空文字に設定
-                      await saveAccessToken('');
-                      _toFeed();
+                      loadAccessToken();
+                      print(accessToken);
+                      _loadingStart();
+                      if (accessToken == '') {
+                        await customModal(
+                          context,
+                          const WebViewPage(urlString: "isLogIn"),
+                          title: 'Qiita Auth',
+                        );
+                      }
+                      _loadingStop();
                     },
-                    child: const Text(
-                      'ログインせずに利用する',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFFFFFFFF),
-                        letterSpacing: 0.75,
-                        height: 1,
+                    text: 'ログイン',
+                    colors: 0xFF468300,
+                  ),
+                ),
+                SizedBox(
+                  width: deviceWidth,
+                  height: deviceHeight * 0.1,
+                  child: Center(
+                    child: TextButton(
+                      onPressed: () async {
+                        //アクセストークンを空文字に設定
+                        await saveAccessToken('');
+                        _toFeed();
+                      },
+                      child: const Text(
+                        'ログインせずに利用する',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFFFFFFF),
+                          letterSpacing: 0.75,
+                          height: 1,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              if (isLoading)
-                BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: 3,
-                    sigmaY: 3,
+                if (isLoading)
+                  BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 3,
+                      sigmaY: 3,
+                    ),
+                    blendMode: BlendMode.srcOver,
+                    child: Container(),
                   ),
-                  blendMode: BlendMode.srcOver,
-                  child: Container(),
-                ),
-            ],
+              ],
+            ),
           ),
-        ),
-        if (isLoading)
-          const Center(
-              child: CupertinoActivityIndicator(
-                  radius: 20.0, color: CupertinoColors.white))
-      ]),
+          if (isLoading)
+            const Padding(
+              padding: EdgeInsets.only(top: 43),
+              child: Center(
+                  child: CupertinoActivityIndicator(
+                      radius: 15.0, color: CupertinoColors.white)),
+            )
+        ]),
+      ),
     );
   }
 
-  Future<void> _loadingToFeed() async {
+  Future<void> _loadingStart() async {
     setState(() {
       isLoading = true;
       imageOpacity = 0.3;
     });
+  }
 
-    if (accessToken != '') {
-      Future.delayed(
-          const Duration(seconds: 1),
-          () => setState(() {
-                isLoading = false;
-                imageOpacity = 0.2;
-                _toFeed();
-              }));
-    } else {
-      setState(() {
-        isLoading = false;
-        imageOpacity = 0.2;
-      });
-      print("アクセストークンの取得に失敗しました");
-    }
+  Future<void> _loadingStop() async {
+    setState(() {
+      isLoading = false;
+      imageOpacity = 0.2;
+    });
   }
 
   void _toFeed() {
-    Navigator.push(
+    Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const HomePage()));
   }
 }
