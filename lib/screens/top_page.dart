@@ -17,7 +17,6 @@ class TopPage extends StatefulWidget {
 class _TopPageState extends State<TopPage> {
   bool isLoading = false;
   double imageOpacity = 0.2;
-  late String result = "";
 
   @override
   Widget build(BuildContext context) {
