@@ -43,13 +43,13 @@ class ArticleDetailListBodyContent extends StatefulWidget {
 class ArticleDetailListBodyContentState
     extends State<ArticleDetailListBodyContent> {
   late final FeedViewModel _feedViewModel;
-  final MyPageViewModel myPageViewModel = MyPageViewModel();
+  late final MyPageViewModel _myPageViewModel;
 
   @override
   void initState() {
     super.initState();
     _feedViewModel = Provider.of<FeedViewModel>(context, listen: false);
-
+    _myPageViewModel = MyPageViewModel();
     Future(() async {
       await fetchItems(_feedViewModel, widget.pageName, widget.tag);
     });
@@ -63,7 +63,7 @@ class ArticleDetailListBodyContentState
         await model.searchQiitaItems(tag!.name, PageName.tagDetailList);
       } else {
         if (pageName == PageName.myPage) {
-          await myPageViewModel.fetchUser();
+          await _myPageViewModel.fetchUser();
         }
         await model.pullQiitaItems(pageName);
       }
@@ -84,7 +84,9 @@ class ArticleDetailListBodyContentState
   }
 
   Widget _buildContent(FeedViewModel model) {
-    if (model.isLoading && model.itemsList.isEmpty) {
+    if (model.isLoading &&
+        model.itemsList.isEmpty &&
+        widget.pageName != PageName.myPage) {
       return const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D));
     }
 
@@ -98,108 +100,110 @@ class ArticleDetailListBodyContentState
     }
 
     final deviceHeight = MediaQuery.of(context).size.height;
-    final deviceWidth = MediaQuery.of(context).size.width;
 
     return Stack(
       children: [
-        if (model.itemsList.isNotEmpty)
-          NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification scrollInfo) {
-              if (!model.isLastPage &&
-                  !model.isLoading &&
-                  ((Theme.of(context).platform == TargetPlatform.android &&
-                          scrollInfo.metrics.atEdge &&
-                          scrollInfo.metrics.pixels > 0) ||
-                      (Theme.of(context).platform == TargetPlatform.iOS &&
-                          scrollInfo.metrics.pixels >=
-                              scrollInfo.metrics.maxScrollExtent + 5))) {
-                model.pullQiitaItems(widget.pageName);
-                print("${Theme.of(context).platform} scroll");
-              }
-              return false;
-            },
-            child: Column(
-              children: [
-                Visibility(
-                  //マイページでのみ表示
-                  visible: widget.pageName == PageName.myPage,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                          height: deviceHeight * 0.313,
-                          child: MyPageProfile(model: myPageViewModel)),
-                      const SizedBox(height: 8,)
-                    ],
-
-                  ),
+        // if (model.itemsList.isNotEmpty)
+        NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification scrollInfo) {
+            if (!model.isLastPage &&
+                !model.isLoading &&
+                ((Theme.of(context).platform == TargetPlatform.android &&
+                        scrollInfo.metrics.atEdge &&
+                        scrollInfo.metrics.pixels > 0) ||
+                    (Theme.of(context).platform == TargetPlatform.iOS &&
+                        scrollInfo.metrics.pixels >=
+                            scrollInfo.metrics.maxScrollExtent + 5))) {
+              model.pullQiitaItems(widget.pageName);
+              print("${Theme.of(context).platform} scroll");
+            }
+            return false;
+          },
+          child: Column(
+            children: [
+              Visibility(
+                //マイページでのみ表示
+                visible: widget.pageName == PageName.myPage,
+                child: Column(
+                  children: [
+                    SizedBox(
+                        height: deviceHeight * 0.313,
+                        child: MyPageProfile(model: _myPageViewModel)),
+                    const SizedBox(
+                      height: 8,
+                    )
+                  ],
                 ),
-                Visibility(
-                  //タグ詳細ページと、マイページでのみ表示
-                  visible: widget.pageName == PageName.tagDetailList ||
-                      widget.pageName == PageName.myPage,
-                  child: Padding(
-                    padding: const EdgeInsets.all(0),
+              ),
+              Visibility(
+                //タグ詳細ページと、マイページでのみ表示
+                visible: widget.pageName == PageName.tagDetailList ||
+                    widget.pageName == PageName.myPage,
+                child: Padding(
+                  padding: const EdgeInsets.all(0),
+                  child: Container(
+                    color: const Color(0xFFf2f2f2),
+                    alignment: Alignment.centerLeft,
                     child: Container(
-                      color: const Color(0xFFf2f2f2),
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                            left: 12.0, top: 8.0, bottom: 8.0),
-                        child: const Text(
-                          '投稿記事',
-                          style: TextStyle(
-                            fontSize: 12.0,
-                            color: Color(0xFF828282),
-                          ),
+                      margin: const EdgeInsets.only(
+                          left: 12.0, top: 8.0, bottom: 8.0),
+                      child: const Text(
+                        '投稿記事',
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          color: Color(0xFF828282),
                         ),
                       ),
                     ),
                   ),
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: model.itemsList.isNotEmpty
-                        ? model.itemsList.length + (model.isLastPage ? 0 : 1)
-                        : 1,
-                    itemBuilder: (BuildContext context, int index) {
-                      final padding =
-                          Theme.of(context).platform == TargetPlatform.android
-                              ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
-                              : const EdgeInsets.fromLTRB(0, 10, 0, 20);
-                      if (index == model.itemsList.length) {
-                        return Center(
+              ),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: model.itemsList.isNotEmpty
+                      ? model.itemsList.length + (model.isLastPage ? 0 : 1)
+                      : 1,
+                  itemBuilder: (BuildContext context, int index) {
+                    final padding =
+                        Theme.of(context).platform == TargetPlatform.android
+                            ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
+                            : const EdgeInsets.fromLTRB(0, 10, 0, 20);
+                    if (index == model.itemsList.length) {
+                      return Stack(children: [
+                        Center(
                           child: Padding(
                             padding: padding,
-                            child: model.isLoading
+                            child: model.isLoading && widget.pageName != PageName.myPage
                                 ? const LoadingWidget(
                                     radius: 18.0, color: Color(0xFF6A717D))
                                 : Container(),
                           ),
-                        );
-                      } else {
-                        return ArticleList(
-                          feedViewModel: _feedViewModel,
-                          index: index,
-                          tag: widget.tag,
-                          itemsList: model.itemsList,
-                          pageName: widget.pageName,
-                        );
-                      }
-                    },
-                  ),
+                        ),
+                      ]);
+                    } else {
+                      return ArticleList(
+                        feedViewModel: _feedViewModel,
+                        index: index,
+                        tag: widget.tag,
+                        itemsList: model.itemsList,
+                        pageName: widget.pageName,
+                      );
+                    }
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
         if (widget.pageName == PageName.feed &&
             !(model.itemsList.isNotEmpty) &&
             !model.isLoading &&
             !model.firstLoading &&
             connectionStatus.interNetConnected)
           _buildNoResultWidget(),
-        if (model.isLoading && model.itemsList.isEmpty)
-          const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D)),
+        // if (model.isLoading && model.itemsList.isEmpty)
+        //   const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D)),
         if (!connectionStatus.interNetConnected && model.itemsList.isEmpty)
           Container(),
       ],
