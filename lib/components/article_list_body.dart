@@ -174,7 +174,7 @@ class ArticleDetailListBodyContentState
                         Center(
                           child: Padding(
                             padding: padding,
-                            child: model.isLoading && widget.pageName != PageName.myPage
+                            child: model.isLoading
                                 ? const LoadingWidget(
                                     radius: 18.0, color: Color(0xFF6A717D))
                                 : Container(),
