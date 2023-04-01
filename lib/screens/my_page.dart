@@ -18,7 +18,6 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  MyPageViewModel myPageViewModel = MyPageViewModel();
   FeedViewModel feedViewModel = FeedViewModel();
 
   @override

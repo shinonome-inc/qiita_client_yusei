@@ -34,7 +34,7 @@ class MyPageProfile extends StatelessWidget {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 60, 0, 20),
+                    padding: const EdgeInsets.fromLTRB(24, 20, 0, 20),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: CachedNetworkImage(
@@ -89,11 +89,12 @@ class MyPageProfile extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 16.0, bottom: 16),
+                          padding: const EdgeInsets.only(top: 16.0, bottom: 16, right: 24),
                           child: SizedBox(
                             width: deviceWidth,
                             child: Text(model.description ,
                                 maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                     fontFamily: 'Noto Sans JP',
                                     fontWeight: FontWeight.w500,
