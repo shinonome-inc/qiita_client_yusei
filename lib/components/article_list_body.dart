@@ -100,6 +100,33 @@ class ArticleDetailListBodyContentState
     }
 
     final deviceHeight = MediaQuery.of(context).size.height;
+    double profileHeight = 0;
+    if(deviceHeight > 1100) {
+      // iPad Air対応
+      profileHeight = 0.213;
+    }
+    else if (deviceHeight > 920) {
+      //iPhone14 Pro, Plus, Pro Max対応
+      profileHeight = 0.272;
+    } else if (deviceHeight > 867) {
+      //Android(Pixel6 Pro)対応
+      profileHeight = 0.29;
+    } else if (deviceHeight > 826) {
+      //Android(Pixel4), iPhone14対応
+      profileHeight = 0.302;
+    } else if (deviceHeight > 783) {
+      //Android(Pixel3a)対応
+      profileHeight = 0.32;
+    } else if (deviceHeight > 700) {
+      //Pixel XL対応
+      profileHeight = 0.352;
+    } else {
+      //iPhone14 SE対応
+      profileHeight = 0.38;
+    }
+
+    profileHeight *= deviceHeight;
+
 print(deviceHeight);
     return Stack(
       children: [
@@ -125,7 +152,7 @@ print(deviceHeight);
                 visible: widget.pageName == PageName.myPage,
                 child: SizedBox(
                   //iPhone SEに対応（SEはdeviceHeightが667.0）
-                  height: deviceHeight < 670 ? deviceHeight * 0.38: deviceHeight * 0.275,
+                  height: profileHeight,
                     child: MyPageProfile(model: _myPageViewModel)),
               ),
               Visibility(
