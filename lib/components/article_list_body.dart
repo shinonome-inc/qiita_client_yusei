@@ -125,7 +125,7 @@ print(deviceHeight);
                 visible: widget.pageName == PageName.myPage,
                 child: SizedBox(
                   //iPhone SEに対応（SEはdeviceHeightが667.0）
-                  height: deviceHeight < 670 ? deviceHeight * 0.378 : deviceHeight * 0.275,
+                  height: deviceHeight < 670 ? deviceHeight * 0.38: deviceHeight * 0.275,
                     child: MyPageProfile(model: _myPageViewModel)),
               ),
               Visibility(
