@@ -34,66 +34,67 @@ class _MyPageProfileState extends State<MyPageProfile> {
               ),
             );
           }
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 20, 0, 20),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: CachedNetworkImage(
-                      imageBuilder: (context, imageProvider) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: imageProvider,
-                            ),
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 0, 20),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: CachedNetworkImage(
+                    imageBuilder: (context, imageProvider) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: imageProvider,
                           ),
-                        );
-                      },
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.person),
-                      imageUrl: model.iconUrl,
-                      width: 50,
-                      height: 50,
-                    ),
+                        ),
+                      );
+                    },
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.person),
+                    imageUrl: model.iconUrl,
+                    width: 50,
+                    height: 50,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 24),
-                  child: Column(
-                    children: [
-                      SizedBox(
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 24),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: deviceWidth,
+                      child: Text(
+                        model.name,
+                        style: const TextStyle(
+                            fontFamily: 'Noto Sans JP',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            letterSpacing: 0.25,
+                            color: Color(0xFF333333)),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: SizedBox(
                         width: deviceWidth,
-                        child: Text(
-                          model.name,
-                          style: const TextStyle(
-                              fontFamily: 'Noto Sans JP',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              letterSpacing: 0.25,
-                              color: Color(0xFF333333)),
-                        ),
+                        child: Text('@${model.id}',
+                            style: const TextStyle(
+                                fontFamily: 'Noto Sans JP',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                                letterSpacing: 0.25,
+                                color: Color(0xFF828282))),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
-                        child: SizedBox(
-                          width: deviceWidth,
-                          child: Text('@${model.id}',
-                              style: const TextStyle(
-                                  fontFamily: 'Noto Sans JP',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                  letterSpacing: 0.25,
-                                  color: Color(0xFF828282))),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 16.0, bottom: 16, right: 24),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 16.0, bottom: 16, right: 24),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: deviceWidth, maxHeight: 36.0),
                         child: SizedBox(
                           width: deviceWidth,
                           child: Text(model.description,
@@ -107,11 +108,34 @@ class _MyPageProfileState extends State<MyPageProfile> {
                                   color: Color(0xFF828282))),
                         ),
                       ),
-                      SizedBox(
-                        height: 12,
-                        child: Row(
-                          children: [
-                            TextButton(
+                    ),
+                    SizedBox(
+                      height: 12,
+                      child: Row(
+                        children: [
+                          TextButton(
+                            onPressed: () {},
+                            style: ButtonStyle(
+                              padding: MaterialStateProperty.all<EdgeInsets>(
+                                const EdgeInsets.symmetric(
+                                    horizontal: 0, vertical: 0),
+                              ),
+                            ),
+                            child: Text(
+                              '${model.followeesCount} フォロー中',
+                              style: const TextStyle(
+                                fontFamily: 'Noto Sans JP',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                                letterSpacing: 0.25,
+                                color: Color(0xFF828282),
+                                height: 1,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: TextButton(
                               onPressed: () {},
                               style: ButtonStyle(
                                 padding: MaterialStateProperty.all<EdgeInsets>(
@@ -120,7 +144,7 @@ class _MyPageProfileState extends State<MyPageProfile> {
                                 ),
                               ),
                               child: Text(
-                                '${model.followeesCount} フォロー中',
+                                '${model.followersCount} フォロワー',
                                 style: const TextStyle(
                                   fontFamily: 'Noto Sans JP',
                                   fontWeight: FontWeight.w500,
@@ -131,38 +155,32 @@ class _MyPageProfileState extends State<MyPageProfile> {
                                 ),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: TextButton(
-                                onPressed: () {},
-                                style: ButtonStyle(
-                                  padding:
-                                      MaterialStateProperty.all<EdgeInsets>(
-                                    const EdgeInsets.symmetric(
-                                        horizontal: 0, vertical: 0),
-                                  ),
-                                ),
-                                child: Text(
-                                  '${model.followersCount} フォロワー',
-                                  style: const TextStyle(
-                                    fontFamily: 'Noto Sans JP',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                    letterSpacing: 0.25,
-                                    color: Color(0xFF828282),
-                                    height: 1,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Container(
+                  color: const Color(0xFFf2f2f2),
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                        left: 12.0, top: 8.0, bottom: 8.0),
+                    child: const Text(
+                      '投稿記事',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: Color(0xFF828282),
+                      ),
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         }),
       ),

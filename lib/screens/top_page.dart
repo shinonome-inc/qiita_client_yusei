@@ -47,6 +47,7 @@ class _TopPageState extends State<TopPage> {
           children: [
         Container(
           height: size.height,
+          width: size.width,
           decoration: BoxDecoration(
               image: DecorationImage(
             colorFilter: ColorFilter.mode(

@@ -100,10 +100,9 @@ class ArticleDetailListBodyContentState
     }
 
     final deviceHeight = MediaQuery.of(context).size.height;
-
+print(deviceHeight);
     return Stack(
       children: [
-        // if (model.itemsList.isNotEmpty)
         NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
             if (!model.isLastPage &&
@@ -124,21 +123,14 @@ class ArticleDetailListBodyContentState
               Visibility(
                 //マイページでのみ表示
                 visible: widget.pageName == PageName.myPage,
-                child: Column(
-                  children: [
-                    SizedBox(
-                        height: deviceHeight * 0.313,
-                        child: MyPageProfile(model: _myPageViewModel)),
-                    const SizedBox(
-                      height: 8,
-                    )
-                  ],
-                ),
+                child: SizedBox(
+                  //iPhone SEに対応（SEはdeviceHeightが667.0）
+                  height: deviceHeight < 670 ? deviceHeight * 0.378 : deviceHeight * 0.275,
+                    child: MyPageProfile(model: _myPageViewModel)),
               ),
               Visibility(
                 //タグ詳細ページと、マイページでのみ表示
-                visible: widget.pageName == PageName.tagDetailList ||
-                    widget.pageName == PageName.myPage,
+                visible: widget.pageName == PageName.tagDetailList,
                 child: Padding(
                   padding: const EdgeInsets.all(0),
                   child: Container(
