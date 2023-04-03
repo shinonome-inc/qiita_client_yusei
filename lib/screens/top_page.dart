@@ -41,114 +41,114 @@ class _TopPageState extends State<TopPage> {
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Stack(children: [
-          Container(
-            height: size.height,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-              colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(imageOpacity),
-                BlendMode.srcATop,
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        alignment: Alignment.topCenter,
+          children: [
+        Container(
+          height: size.height,
+          decoration: BoxDecoration(
+              image: DecorationImage(
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(imageOpacity),
+              BlendMode.srcATop,
+            ),
+            fit: BoxFit.cover,
+            image: const AssetImage('assets/images/背景画像.png'),
+          )),
+          child: Column(
+            children: [
+              SizedBox(
+                height: deviceHeight * 0.23,
               ),
-              fit: BoxFit.cover,
-              image: const AssetImage('assets/images/背景画像.png'),
-            )),
-            alignment: Alignment.center,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: deviceHeight * 0.23,
+              const Text(
+                'Qiita Feed App',
+                style: TextStyle(
+                  fontFamily: 'Pacifico',
+                  fontSize: 36.0,
+                  color: Color(0xFFFFFFFF),
+                  height: 1,
                 ),
-                const Text(
-                  'Qiita Feed App',
-                  style: TextStyle(
-                    fontFamily: 'Pacifico',
-                    fontSize: 36.0,
+              ),
+              const SizedBox(
+                height: 14,
+              ),
+              const Text(
+                '-PlayGround-',
+                style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w700,
                     color: Color(0xFFFFFFFF),
-                  ),
+                    letterSpacing: 0.25,
+                    height: 1),
+              ),
+              SizedBox(
+                height: deviceHeight * 0.45,
+              ),
+              SizedBox(
+                width: deviceWidth * 0.85,
+                height: deviceHeight * 0.07,
+                child: CustomButton(
+                  btnLoading: false,
+                  onPressed: () async {
+                    loadAccessToken();
+                    print(accessToken);
+                    _loadingStart();
+                    if (accessToken == '') {
+                      await customModal(
+                        context,
+                        const WebViewPage(urlString: "isLogIn"),
+                        title: 'Qiita Auth',
+                      );
+                    }
+                    _loadingStop();
+                  },
+                  text: 'ログイン',
+                  colors: 0xFF468300,
                 ),
-                const SizedBox(
-                  height: 14,
-                ),
-                const Text(
-                  '-PlayGround-',
-                  style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFFFFFFFF),
-                      letterSpacing: 0.25,
-                      height: 1),
-                ),
-                SizedBox(
-                  height: deviceHeight * 0.45,
-                ),
-                SizedBox(
-                  width: deviceWidth * 0.85,
-                  height: deviceHeight * 0.07,
-                  child: CustomButton(
-                    btnLoading: false,
+              ),
+              SizedBox(
+                width: deviceWidth,
+                height: deviceHeight * 0.1,
+                child: Center(
+                  child: TextButton(
                     onPressed: () async {
-                      loadAccessToken();
-                      print(accessToken);
-                      _loadingStart();
-                      if (accessToken == '') {
-                        await customModal(
-                          context,
-                          const WebViewPage(urlString: "isLogIn"),
-                          title: 'Qiita Auth',
-                        );
-                      }
-                      _loadingStop();
+                      //アクセストークンを空文字に設定
+                      await saveAccessToken('');
+                      _toFeed();
                     },
-                    text: 'ログイン',
-                    colors: 0xFF468300,
-                  ),
-                ),
-                SizedBox(
-                  width: deviceWidth,
-                  height: deviceHeight * 0.1,
-                  child: Center(
-                    child: TextButton(
-                      onPressed: () async {
-                        //アクセストークンを空文字に設定
-                        await saveAccessToken('');
-                        _toFeed();
-                      },
-                      child: const Text(
-                        'ログインせずに利用する',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFFFFFFFF),
-                          letterSpacing: 0.75,
-                          height: 1,
-                        ),
+                    child: const Text(
+                      'ログインせずに利用する',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFFFFFFF),
+                        letterSpacing: 0.75,
+                        height: 1,
                       ),
                     ),
                   ),
                 ),
-                if (isLoading)
-                  BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: 3,
-                      sigmaY: 3,
-                    ),
-                    blendMode: BlendMode.srcOver,
-                    child: Container(),
+              ),
+              if (isLoading)
+                BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: 3,
+                    sigmaY: 3,
                   ),
-              ],
-            ),
+                  blendMode: BlendMode.srcOver,
+                  child: Container(),
+                ),
+            ],
           ),
-          if (isLoading)
-            const Padding(
-              padding: EdgeInsets.only(top: 43),
-              child: Center(
-                  child: CupertinoActivityIndicator(
-                      radius: 15.0, color: CupertinoColors.white)),
-            )
-        ]),
-      ),
+        ),
+        if (isLoading)
+          Padding(
+            padding: EdgeInsets.only(top: deviceHeight * 0.06),
+            child: const CupertinoActivityIndicator(
+                radius: 15.0, color: CupertinoColors.white),
+          ),
+      ]),
     );
   }
 
