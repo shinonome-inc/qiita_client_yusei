@@ -101,11 +101,10 @@ class ArticleDetailListBodyContentState
 
     final deviceHeight = MediaQuery.of(context).size.height;
     double profileHeight = 0;
-    if(deviceHeight > 1100) {
+    if (deviceHeight > 1100) {
       // iPad Air対応
       profileHeight = 0.213;
-    }
-    else if (deviceHeight > 920) {
+    } else if (deviceHeight > 920) {
       //iPhone14 Pro, Plus, Pro Max対応
       profileHeight = 0.272;
     } else if (deviceHeight > 867) {
@@ -127,19 +126,20 @@ class ArticleDetailListBodyContentState
 
     profileHeight *= deviceHeight;
 
-print(deviceHeight);
+    print(deviceHeight);
     return Stack(
       children: [
         NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
-            if (!model.isLastPage &&
-                !model.isLoading &&
+            final isScrollBottom =
                 ((Theme.of(context).platform == TargetPlatform.android &&
                         scrollInfo.metrics.atEdge &&
                         scrollInfo.metrics.pixels > 0) ||
                     (Theme.of(context).platform == TargetPlatform.iOS &&
                         scrollInfo.metrics.pixels >=
-                            scrollInfo.metrics.maxScrollExtent + 5))) {
+                            scrollInfo.metrics.maxScrollExtent + 5));
+
+            if (!model.isLastPage && !model.isLoading && isScrollBottom) {
               model.pullQiitaItems(widget.pageName);
               print("${Theme.of(context).platform} scroll");
             }
@@ -151,8 +151,8 @@ print(deviceHeight);
                 //マイページでのみ表示
                 visible: widget.pageName == PageName.myPage,
                 child: SizedBox(
-                  //iPhone SEに対応（SEはdeviceHeightが667.0）
-                  height: profileHeight,
+                    //iPhone SEに対応（SEはdeviceHeightが667.0）
+                    height: profileHeight,
                     child: MyPageProfile(model: _myPageViewModel)),
               ),
               Visibility(
