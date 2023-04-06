@@ -43,13 +43,13 @@ class ArticleDetailListBodyContent extends StatefulWidget {
 class ArticleDetailListBodyContentState
     extends State<ArticleDetailListBodyContent> {
   late final FeedViewModel _feedViewModel;
-  final MyPageViewModel myPageViewModel = MyPageViewModel();
+  late final MyPageViewModel _myPageViewModel;
 
   @override
   void initState() {
     super.initState();
     _feedViewModel = Provider.of<FeedViewModel>(context, listen: false);
-
+    _myPageViewModel = MyPageViewModel();
     Future(() async {
       await fetchItems(_feedViewModel, widget.pageName, widget.tag);
     });
@@ -63,7 +63,7 @@ class ArticleDetailListBodyContentState
         await model.searchQiitaItems(tag!.name, PageName.tagDetailList);
       } else {
         if (pageName == PageName.myPage) {
-          await myPageViewModel.fetchUser();
+          await _myPageViewModel.fetchUser();
         }
         await model.pullQiitaItems(pageName);
       }
@@ -84,7 +84,9 @@ class ArticleDetailListBodyContentState
   }
 
   Widget _buildContent(FeedViewModel model) {
-    if (model.isLoading && model.itemsList.isEmpty) {
+    if (model.isLoading &&
+        model.itemsList.isEmpty &&
+        widget.pageName != PageName.myPage) {
       return const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D));
     }
 
@@ -98,41 +100,66 @@ class ArticleDetailListBodyContentState
     }
 
     final deviceHeight = MediaQuery.of(context).size.height;
-    final deviceWidth = MediaQuery.of(context).size.width;
+    double profileHeight = 0;
+    if (deviceHeight > 1100) {
+      // iPad Air対応
+      profileHeight = 0.213;
+    } else if (deviceHeight > 920) {
+      //iPhone14 Pro, Plus, Pro Max対応
+      profileHeight = 0.272;
+    } else if (deviceHeight > 867) {
+      //Android(Pixel6 Pro)対応
+      profileHeight = 0.29;
+    } else if (deviceHeight > 826) {
+      //Android(Pixel4), iPhone14対応
+      profileHeight = 0.302;
+    } else if (deviceHeight > 783) {
+      //Android(Pixel3a)対応
+      profileHeight = 0.32;
+    } else if (deviceHeight > 700) {
+      //Pixel XL対応
+      profileHeight = 0.352;
+    } else {
+      //iPhone14 SE対応
+      profileHeight = 0.38;
+    }
 
+    profileHeight *= deviceHeight;
+
+    print(deviceHeight);
     return Stack(
       children: [
-        if (model.itemsList.isNotEmpty)
-          NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification scrollInfo) {
-              if (!model.isLastPage &&
-                  !model.isLoading &&
-                  ((Theme.of(context).platform == TargetPlatform.android &&
-                          scrollInfo.metrics.atEdge &&
-                          scrollInfo.metrics.pixels > 0) ||
-                      (Theme.of(context).platform == TargetPlatform.iOS &&
-                          scrollInfo.metrics.pixels >=
-                              scrollInfo.metrics.maxScrollExtent + 5))) {
-                model.pullQiitaItems(widget.pageName);
-                print("${Theme.of(context).platform} scroll");
-              }
-              return false;
-            },
-            child: Column(
-              children: [
-                Visibility(
-                  //マイページでのみ表示
-                  visible: widget.pageName == PageName.myPage,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                        maxWidth: deviceWidth, maxHeight: deviceHeight * 0.28),
-                    child: MyPageProfile(model: myPageViewModel),
-                  ),
-                ),
-                Visibility(
-                  //タグ詳細ページと、マイページでのみ表示
-                  visible: widget.pageName == PageName.tagDetailList ||
-                      widget.pageName == PageName.myPage,
+        NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification scrollInfo) {
+            final isScrollBottom =
+                ((Theme.of(context).platform == TargetPlatform.android &&
+                        scrollInfo.metrics.atEdge &&
+                        scrollInfo.metrics.pixels > 0) ||
+                    (Theme.of(context).platform == TargetPlatform.iOS &&
+                        scrollInfo.metrics.pixels >=
+                            scrollInfo.metrics.maxScrollExtent + 5));
+
+            if (!model.isLastPage && !model.isLoading && isScrollBottom) {
+              model.pullQiitaItems(widget.pageName);
+              print("${Theme.of(context).platform} scroll");
+            }
+            return false;
+          },
+          child: Column(
+            children: [
+              Visibility(
+                //マイページでのみ表示
+                visible: widget.pageName == PageName.myPage,
+                child: SizedBox(
+                    //iPhone SEに対応（SEはdeviceHeightが667.0）
+                    height: profileHeight,
+                    child: MyPageProfile(model: _myPageViewModel)),
+              ),
+              Visibility(
+                //タグ詳細ページと、マイページでのみ表示
+                visible: widget.pageName == PageName.tagDetailList,
+                child: Padding(
+                  padding: const EdgeInsets.all(0),
                   child: Container(
                     color: const Color(0xFFf2f2f2),
                     alignment: Alignment.centerLeft,
@@ -149,19 +176,21 @@ class ArticleDetailListBodyContentState
                     ),
                   ),
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: model.itemsList.isNotEmpty
-                        ? model.itemsList.length + (model.isLastPage ? 0 : 1)
-                        : 1,
-                    itemBuilder: (BuildContext context, int index) {
-                      final padding =
-                          Theme.of(context).platform == TargetPlatform.android
-                              ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
-                              : const EdgeInsets.fromLTRB(0, 10, 0, 20);
-                      if (index == model.itemsList.length) {
-                        return Center(
+              ),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: model.itemsList.isNotEmpty
+                      ? model.itemsList.length + (model.isLastPage ? 0 : 1)
+                      : 1,
+                  itemBuilder: (BuildContext context, int index) {
+                    final padding =
+                        Theme.of(context).platform == TargetPlatform.android
+                            ? const EdgeInsets.fromLTRB(0, 40, 0, 30)
+                            : const EdgeInsets.fromLTRB(0, 10, 0, 20);
+                    if (index == model.itemsList.length) {
+                      return Stack(children: [
+                        Center(
                           child: Padding(
                             padding: padding,
                             child: model.isLoading
@@ -169,30 +198,31 @@ class ArticleDetailListBodyContentState
                                     radius: 18.0, color: Color(0xFF6A717D))
                                 : Container(),
                           ),
-                        );
-                      } else {
-                        return ArticleList(
-                          feedViewModel: _feedViewModel,
-                          index: index,
-                          tag: widget.tag,
-                          itemsList: model.itemsList,
-                          pageName: widget.pageName,
-                        );
-                      }
-                    },
-                  ),
+                        ),
+                      ]);
+                    } else {
+                      return ArticleList(
+                        feedViewModel: _feedViewModel,
+                        index: index,
+                        tag: widget.tag,
+                        itemsList: model.itemsList,
+                        pageName: widget.pageName,
+                      );
+                    }
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
         if (widget.pageName == PageName.feed &&
             !(model.itemsList.isNotEmpty) &&
             !model.isLoading &&
             !model.firstLoading &&
             connectionStatus.interNetConnected)
           _buildNoResultWidget(),
-        if (model.isLoading && model.itemsList.isEmpty)
-          const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D)),
+        // if (model.isLoading && model.itemsList.isEmpty)
+        //   const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D)),
         if (!connectionStatus.interNetConnected && model.itemsList.isEmpty)
           Container(),
       ],

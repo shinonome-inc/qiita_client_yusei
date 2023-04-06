@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/components/custom_btn.dart';
 import 'package:flutter_app/screens/home_page.dart';
+import '../components/custom_modal.dart';
+import '../components/web_view_screen.dart';
 import '../main.dart';
 
 class TopPage extends StatefulWidget {
@@ -39,8 +41,13 @@ class _TopPageState extends State<TopPage> {
     }
 
     return Scaffold(
-      body: Stack(children: [
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        alignment: Alignment.topCenter,
+          children: [
         Container(
+          height: size.height,
+          width: size.width,
           decoration: BoxDecoration(
               image: DecorationImage(
             colorFilter: ColorFilter.mode(
@@ -50,7 +57,6 @@ class _TopPageState extends State<TopPage> {
             fit: BoxFit.cover,
             image: const AssetImage('assets/images/背景画像.png'),
           )),
-          alignment: Alignment.center,
           child: Column(
             children: [
               SizedBox(
@@ -62,6 +68,7 @@ class _TopPageState extends State<TopPage> {
                   fontFamily: 'Pacifico',
                   fontSize: 36.0,
                   color: Color(0xFFFFFFFF),
+                  height: 1,
                 ),
               ),
               const SizedBox(
@@ -85,12 +92,17 @@ class _TopPageState extends State<TopPage> {
                 child: CustomButton(
                   btnLoading: false,
                   onPressed: () async {
-                    //アクセストークンを設定  TODO 認証系実装時に削除する
-                    const token = '3341b23482c9b4df03fad426ae9a153bebaacb02';
-
-                    // アクセストークンを保存する
-                    await saveAccessToken(token);
-                    _loadingToFeed();
+                    loadAccessToken();
+                    print(accessToken);
+                    _loadingStart();
+                    if (accessToken == '') {
+                      await customModal(
+                        context,
+                        const WebViewPage(urlString: "isLogIn"),
+                        title: 'Qiita Auth',
+                      );
+                    }
+                    _loadingStop();
                   },
                   text: 'ログイン',
                   colors: 0xFF468300,
@@ -132,38 +144,31 @@ class _TopPageState extends State<TopPage> {
           ),
         ),
         if (isLoading)
-          const Center(
-              child: CupertinoActivityIndicator(
-                  radius: 20.0, color: CupertinoColors.white))
+          Padding(
+            padding: EdgeInsets.only(top: deviceHeight * 0.06),
+            child: const CupertinoActivityIndicator(
+                radius: 15.0, color: CupertinoColors.white),
+          ),
       ]),
     );
   }
 
-  Future<void> _loadingToFeed() async {
+  Future<void> _loadingStart() async {
     setState(() {
       isLoading = true;
       imageOpacity = 0.3;
     });
+  }
 
-    if (accessToken != '') {
-      Future.delayed(
-          const Duration(seconds: 1),
-          () => setState(() {
-                isLoading = false;
-                imageOpacity = 0.2;
-                _toFeed();
-              }));
-    } else {
-      setState(() {
-        isLoading = false;
-        imageOpacity = 0.2;
-      });
-      print("アクセストークンの取得に失敗しました");
-    }
+  Future<void> _loadingStop() async {
+    setState(() {
+      isLoading = false;
+      imageOpacity = 0.2;
+    });
   }
 
   void _toFeed() {
-    Navigator.push(
+    Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const HomePage()));
   }
 }

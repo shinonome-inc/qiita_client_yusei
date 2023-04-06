@@ -63,13 +63,15 @@ class _TagPageState extends State<TagPage> {
 
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
-        if (!model.isLastPage && !model.isLoading &&
+        final isScrollBottom =
             ((Theme.of(context).platform == TargetPlatform.android &&
-                scrollInfo.metrics.atEdge &&
-                scrollInfo.metrics.pixels > 0) ||
+                    scrollInfo.metrics.atEdge &&
+                    scrollInfo.metrics.pixels > 0) ||
                 (Theme.of(context).platform == TargetPlatform.iOS &&
                     scrollInfo.metrics.pixels >=
-                        scrollInfo.metrics.maxScrollExtent + 5))) {
+                        scrollInfo.metrics.maxScrollExtent + 5));
+
+        if (!model.isLastPage && !model.isLoading && isScrollBottom) {
           model.fetchTags();
           print("${Theme.of(context).platform} scroll");
         }
