@@ -16,7 +16,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (title == 'Feed') {}
     return AppBar(
       backgroundColor: Colors.white,
       shadowColor: Colors.white.withOpacity(0.3),
