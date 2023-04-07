@@ -3,7 +3,6 @@ import 'package:flutter_app/screens/feed_page.dart';
 import 'package:flutter_app/screens/tag_page.dart';
 import 'package:flutter_app/screens/my_page.dart';
 import 'package:flutter_app/screens/setting_page.dart';
-import '../main.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -21,38 +20,15 @@ class _HomePageState extends State<HomePage> {
   ];
 
   var _currentIndex = 0;
-  String? _title;
-  var _color = Colors.transparent;
 
   @override
   void initState() {
     super.initState();
-    _color = Colors.transparent;
-    _title = 'Feed';
   }
 
   void _onTap(int index) {
     setState(() {
       _currentIndex = index;
-
-      switch (index) {
-        case 0:
-          _title = 'Feed';
-          _color = Colors.transparent;
-          break;
-        case 1:
-          _title = 'Tags';
-          _color = Colors.white.withOpacity(0.3);
-          break;
-        case 2:
-          _title = 'MyPage';
-          _color = Colors.white.withOpacity(0.3);
-          break;
-        case 3:
-          _title = 'Settings';
-          _color = Colors.white.withOpacity(0.3);
-          break;
-      }
     });
   }
 
@@ -61,31 +37,6 @@ class _HomePageState extends State<HomePage> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        appBar: !connectionStatus.interNetConnected
-            ? AppBar(
-          backgroundColor: Colors.white,
-          shadowColor: Colors.white.withOpacity(0.3),
-          automaticallyImplyLeading: false,
-          title: null,
-          // toolbarHeight: 0,
-        )
-            : AppBar(
-          backgroundColor: Colors.white,
-          shadowColor: _color,
-          automaticallyImplyLeading: false,
-          title: _title != ''
-              ? Text(
-            _title!,
-            style: const TextStyle(
-              fontFamily: 'Pacifico',
-              fontSize: 17.0,
-              color: Colors.black,
-            ),
-          )
-              : null,
-          centerTitle: true,
-          toolbarHeight: 70,
-        ),
         body: display[_currentIndex],
         bottomNavigationBar: Container(
           decoration: BoxDecoration(

@@ -6,31 +6,19 @@ class CustomButton extends StatefulWidget {
     required this.text,
     required this.onPressed,
     required this.colors,
-    required this.btnLoading,
-    this.loadingSeconds = 3,
+
   }) : super(key: key);
   final int colors;
   final String text;
   final VoidCallback onPressed;
-  final int loadingSeconds;
-  final bool btnLoading;
+
+
 
   @override
   State<CustomButton> createState() => _CustomButtonState();
 }
 
 class _CustomButtonState extends State<CustomButton> {
-  bool isLoading = false;
-
-  void _loadingToFeed() async {
-    setState(() {
-      isLoading = true;
-    });
-    await Future.delayed(Duration(seconds: widget.loadingSeconds));
-    setState(() {
-      isLoading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,30 +51,17 @@ class _CustomButtonState extends State<CustomButton> {
         ),
         minimumSize: Size(deviceWidth, deviceHeight),
       ),
-      child: isLoading
-          ? SizedBox(
-              height: 20,
-              width: 20,
-              child: Visibility(
-                visible: widget.btnLoading,
-                child: const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.5,
-                ),
-              ),
-            )
-          : Text(
-              widget.text,
-              style: const TextStyle(
-                fontSize: 14.0,
-                color: Color(0xFFF9FCFF),
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.75,
-                height: 1.14,
-              ),
-            ),
+      child: Text(
+        widget.text,
+        style: const TextStyle(
+          fontSize: 14.0,
+          color: Color(0xFFF9FCFF),
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.75,
+          height: 1.14,
+        ),
+      ),
       onPressed: () {
-        _loadingToFeed();
         widget.onPressed.call();
       },
     );

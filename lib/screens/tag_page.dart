@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../components/custom_appbar.dart';
 import '../components/loading_widget.dart';
 import '../components/no_internet_widget.dart';
 import '../components/tag_card.dart';
@@ -41,6 +42,7 @@ class _TagPageState extends State<TagPage> {
       onPressed: () async {
         if (await ConnectionStatus.checkConnectivity()) {
           connectionStatus.interNetConnected = true;
+          setState(() {});
           tagViewModel.firstLoading = true;
           tagViewModel.fetchTags();
         } else {
@@ -112,6 +114,10 @@ class _TagPageState extends State<TagPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //ネットワーク接続がある時のみ専用のAppBarを表示
+      appBar: connectionStatus.interNetConnected
+          ? const CustomAppBar(title: 'Tags')
+          : null,
       body: ChangeNotifierProvider.value(
         value: tagViewModel,
         child: Consumer<TagViewModel>(
