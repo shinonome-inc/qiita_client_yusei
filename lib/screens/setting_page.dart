@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/components/custom_modal.dart';
 import 'package:flutter_app/components/no_internet_widget.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_app/config/modal_text.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/screens/top_page.dart';
 import 'package:flutter_app/util/connection_status.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../components/custom_appbar.dart';
 
@@ -54,9 +57,17 @@ class _SettingPageState extends State<SettingPage> {
     return null;
   }
 
+  PackageInfo _packageInfo = PackageInfo(
+    appName: 'Unknown',
+    packageName: 'Unknown',
+    version: 'Unknown',
+    buildNumber: 'Unknown',
+  );
+
   @override
   void initState() {
     super.initState();
+    _initPackageInfo();
     Future(() async {
       await ConnectionStatus.checkConnectivity().then((isConnected) {
         if (isConnected) {
@@ -65,6 +76,13 @@ class _SettingPageState extends State<SettingPage> {
           connectionStatus.interNetConnected = false;
         }
       });
+    });
+  }
+
+  Future<void> _initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      _packageInfo = info;
     });
   }
 
@@ -93,6 +111,7 @@ class _SettingPageState extends State<SettingPage> {
       },
     );
   }
+
 
   Widget _buildLists() {
     if (connectionStatus.interNetConnected) {
@@ -132,7 +151,7 @@ class _SettingPageState extends State<SettingPage> {
                               _showModal('利用規約', ModalText.termsOfServiceText)),
                       const Divider(height: 1, thickness: 1, indent: 16),
                       _buildListTile('アプリバージョン', null, null,
-                          trailingText: 'v.1.0.0'),
+                          trailingText: "v${_packageInfo.version}"),
                       const Divider(height: 1, thickness: 1, indent: 16),
                     ],
                   ),
