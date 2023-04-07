@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/components/article_list.dart';
-import 'package:flutter_app/components/no_internet_widget.dart';
 import 'package:flutter_app/model/tag.dart';
 import 'package:flutter_app/util/connection_status.dart';
 import 'package:flutter_app/view_model/feed_view_model.dart';
@@ -88,18 +87,6 @@ class ArticleDetailListBodyContentState
         model.itemsList.isEmpty &&
         widget.pageName != PageName.myPage) {
       return const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D));
-    }
-
-    if (!connectionStatus.interNetConnected &&
-        model.itemsList.isEmpty &&
-        widget.pageName != PageName.feed &&
-        widget.pageName != PageName.myPage) {
-      return NoInternetWidget(
-        onPressed: () async {
-          await fetchItems(
-              context.read<FeedViewModel>(), widget.pageName, widget.tag);
-        },
-      );
     }
 
     final deviceHeight = MediaQuery.of(context).size.height;
