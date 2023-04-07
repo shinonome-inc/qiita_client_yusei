@@ -22,13 +22,11 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   FeedViewModel feedViewModel = FeedViewModel();
 
-
   @override
   Widget build(BuildContext context) {
     if (connectionStatus.interNetConnected) {
       // ネットワーク接続ありの場合のウィジェット
-      return Scaffold(
-          body: _buildLists());
+      return Scaffold(body: _buildLists());
     } else {
       // ネットワーク接続なしの場合のウィジェット
       return _buildNoInternetWidget();
@@ -49,7 +47,6 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-
   Widget _buildLists() {
     final deviceHeight = MediaQuery.of(context).size.height;
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -61,8 +58,7 @@ class _MyPageState extends State<MyPage> {
       return Scaffold(
         //ネットワーク接続がある時のみ専用のAppBarを表示
         appBar: connectionStatus.interNetConnected
-            ?
-        const CustomAppBar(title: 'MyPage')
+            ? const CustomAppBar(title: 'MyPage')
             : null,
         body: ChangeNotifierProvider(
             create: (_) => feedViewModel,
@@ -74,13 +70,14 @@ class _MyPageState extends State<MyPage> {
       return Scaffold(
         //ネットワーク接続がある時のみ専用のAppBarを表示
         appBar: connectionStatus.interNetConnected && accessToken.isEmpty
-            ?
-        const CustomAppBar(title: 'MyPage')
+            ? const CustomAppBar(title: 'MyPage')
             : null,
         body: Center(
           child: Column(
             children: [
-              SizedBox(height: deviceHeight * 0.267,),
+              SizedBox(
+                height: deviceHeight * 0.267,
+              ),
               const Text(
                 'ログインが必要です',
                 textAlign: TextAlign.center,
