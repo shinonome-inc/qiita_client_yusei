@@ -109,7 +109,7 @@ class _WebViewPageState extends State<WebViewPage> {
     final token = await QiitaApiService.issueAccessToken(uri, state);
     saveAccessToken(token);
 
-    if (accessToken != '' || accessToken != null) {
+    if(accessToken != '') {
       print("遷移してok");
       Navigator.of(context)
           .pushReplacement(MaterialPageRoute(builder: (_) => const HomePage()));

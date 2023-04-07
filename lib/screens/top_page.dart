@@ -90,7 +90,6 @@ class _TopPageState extends State<TopPage> {
                 width: deviceWidth * 0.85,
                 height: deviceHeight * 0.07,
                 child: CustomButton(
-                  btnLoading: false,
                   onPressed: () async {
                     loadAccessToken();
                     print(accessToken);

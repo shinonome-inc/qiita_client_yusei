@@ -90,7 +90,10 @@ class ArticleDetailListBodyContentState
       return const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D));
     }
 
-    if (!connectionStatus.interNetConnected && model.itemsList.isEmpty) {
+    if (!connectionStatus.interNetConnected &&
+        model.itemsList.isEmpty &&
+        widget.pageName != PageName.feed &&
+        widget.pageName != PageName.myPage) {
       return NoInternetWidget(
         onPressed: () async {
           await fetchItems(
