@@ -7,6 +7,9 @@ import '../util/connection_status.dart';
 // インスタンスへの参照を取得
 final connectionStatus = ConnectionStatus();
 
+//API関連のエラーがあるかどうかを判定する
+bool isRequestError = false;
+
 // Qiita APIのアクセストークン
 // アクセストークンを保持するグローバル変数
 late String accessToken;

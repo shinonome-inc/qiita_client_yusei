@@ -1,5 +1,6 @@
 import '../api/qiita_api_service.dart';
 import 'package:flutter/material.dart';
+import '../main.dart';
 import '../model/tag.dart';
 
 class TagViewModel extends ChangeNotifier {
@@ -9,6 +10,7 @@ class TagViewModel extends ChangeNotifier {
   final QiitaApiService _qiitaApiService = QiitaApiService();
   bool _isLastPage = false;
   bool _firstLoading = false;
+  bool _isError = false;
   final int _perPage = 20;
 
   List<Tag> get tags => _tags;
@@ -21,6 +23,8 @@ class TagViewModel extends ChangeNotifier {
 
   bool get isLastPage => _isLastPage;
 
+  bool get isError => _isError;
+
   set firstLoading(bool value) {
     _firstLoading = value;
     notifyListeners();
@@ -31,6 +35,10 @@ class TagViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  set isError(bool value) {
+    _isError = value;
+    notifyListeners();
+  }
 
   Future<void> fetchTags() async {
     if (_isLastPage) {
@@ -42,6 +50,17 @@ class TagViewModel extends ChangeNotifier {
       notifyListeners();
     }
 
+    if(isRequestError){
+      print("error detected");
+      _isError = true;
+      _firstLoading = false;
+      notifyListeners();
+    } else {
+      print("error no detected");
+      _isError = false;
+      notifyListeners();
+    }
+
     // タグ一覧を取得
     List<Tag> newTags = await _qiitaApiService.fetchTagList(
         _tags.length ~/ _perPage + 1, _perPage);
@@ -49,6 +68,7 @@ class TagViewModel extends ChangeNotifier {
     if (newTags.isEmpty) {
       _isLastPage = true;
     }
+
 
     // 取得したタグを既存のタグリストに追加
     _tags.addAll(newTags);

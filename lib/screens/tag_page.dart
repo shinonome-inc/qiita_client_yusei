@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../components/api_error_widget.dart';
 import '../components/custom_appbar.dart';
 import '../components/loading_widget.dart';
 import '../components/no_internet_widget.dart';
 import '../components/tag_card.dart';
 import '../main.dart';
+import '../model/page_name.dart';
 import '../util/connection_status.dart';
 import '../view_model/tag_view_model.dart';
 
@@ -138,20 +140,32 @@ class _TagPageState extends State<TagPage> {
         child: Consumer<TagViewModel>(
           builder: (context, model, child) {
             if (model.firstLoading &&
-                model.tags.isEmpty &&
+                model.tags.isEmpty && !isRequestError &&
                 connectionStatus.interNetConnected) {
               return _buildInitialLoadingWidget();
             } else if (!connectionStatus.interNetConnected &&
                 model.tags.isEmpty) {
               return _buildNoInternetWidget();
             } else {
+              // return Stack(
+              //   children: [
+              //     Visibility(
+              //       visible: model.tags.isNotEmpty,
+              //       child: _buildTagsGridView(model),
+              //     ),
+              //     if (!model.firstLoading &&
+              //         connectionStatus.interNetConnected &&
+              //         isRequestError)
+              //     //APIリクエストエラーがある時は表示する
+              //       buildApiErrorWidget(context, PageName.tags),
+              //   ],
+              // );
               return Stack(
-                children: [
-                  Visibility(
-                    visible: model.tags.isNotEmpty,
-                    child: _buildTagsGridView(model),
-                  ),
-                ],
+                children: model.isError &&  model.tags.isEmpty
+                    ? [
+                  buildApiErrorWidget(context, PageName.tags)
+                ]
+                    : [_buildTagsGridView(model)],
               );
             }
           },
