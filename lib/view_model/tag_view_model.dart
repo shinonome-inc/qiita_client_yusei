@@ -26,6 +26,12 @@ class TagViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  set isLastPage(bool value) {
+    _isLastPage = value;
+    notifyListeners();
+  }
+
+
   Future<void> fetchTags() async {
     if (_isLastPage) {
       return;
