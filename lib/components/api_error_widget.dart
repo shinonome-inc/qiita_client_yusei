@@ -14,14 +14,12 @@ Widget buildApiErrorWidget(context, PageName pageName) {
     case PageName.feed:
       heightRatio = 0.158;
       break;
+    case PageName.tags:
+      // heightRatio = 0.209;
+      break;
     case PageName.tagDetailList:
-      heightRatio = 0.226;
       break;
     case PageName.myPage:
-      heightRatio = 0.209;
-      break;
-    case PageName.tags:
-      heightRatio = 0.209;
       break;
   }
 

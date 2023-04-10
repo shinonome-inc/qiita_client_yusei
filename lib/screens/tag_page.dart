@@ -61,14 +61,13 @@ class _TagPageState extends State<TagPage> {
   Future _onRefresh() async {
     // オーバースクロールされた時に実行する関数を定義
 
-      //pull to refresh時はページ数、タグリストを初期化して取得し直す
-      tagViewModel.tags.clear();
-      tagViewModel.firstLoading = true;
-      tagViewModel.isLastPage = false;
-      tagViewModel.fetchTags();
-      _buildTagsGridView(tagViewModel);
+    //pull to refresh時はページ数、タグリストを初期化して取得し直す
+    tagViewModel.tags.clear();
+    tagViewModel.firstLoading = true;
+    tagViewModel.isLastPage = false;
+    tagViewModel.fetchTags();
+    _buildTagsGridView(tagViewModel);
   }
-
 
   Widget _buildTagsGridView(TagViewModel model) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -139,32 +138,19 @@ class _TagPageState extends State<TagPage> {
         value: tagViewModel,
         child: Consumer<TagViewModel>(
           builder: (context, model, child) {
-            if (model.firstLoading &&
-                model.tags.isEmpty && !isRequestError &&
-                connectionStatus.interNetConnected) {
+            final showInitialLoad = model.firstLoading &&
+                model.tags.isEmpty &&
+                !isRequestError &&
+                connectionStatus.interNetConnected;
+            if (showInitialLoad) {
               return _buildInitialLoadingWidget();
             } else if (!connectionStatus.interNetConnected &&
                 model.tags.isEmpty) {
               return _buildNoInternetWidget();
             } else {
-              // return Stack(
-              //   children: [
-              //     Visibility(
-              //       visible: model.tags.isNotEmpty,
-              //       child: _buildTagsGridView(model),
-              //     ),
-              //     if (!model.firstLoading &&
-              //         connectionStatus.interNetConnected &&
-              //         isRequestError)
-              //     //APIリクエストエラーがある時は表示する
-              //       buildApiErrorWidget(context, PageName.tags),
-              //   ],
-              // );
               return Stack(
-                children: model.isError &&  model.tags.isEmpty
-                    ? [
-                  buildApiErrorWidget(context, PageName.tags)
-                ]
+                children: model.isError && model.tags.isEmpty
+                    ? [buildApiErrorWidget(context, PageName.tags)]
                     : [_buildTagsGridView(model)],
               );
             }

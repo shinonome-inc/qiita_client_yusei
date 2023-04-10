@@ -103,10 +103,11 @@ class ArticleDetailListBodyContentState
   }
 
   Widget _buildContent(FeedViewModel model) {
-    if (model.firstLoading &&
-        // !model.isLoading &&
+    final showLoad = model.firstLoading &&
         model.itemsList.isEmpty &&
-        widget.pageName != PageName.myPage) {
+        widget.pageName != PageName.myPage;
+
+    if (showLoad) {
       return const LoadingWidget(radius: 18.0, color: Color(0xFF6A717D));
     }
 
@@ -138,6 +139,21 @@ class ArticleDetailListBodyContentState
     profileHeight *= deviceHeight;
 
     print(deviceHeight);
+
+    final showNoResult = widget.pageName == PageName.feed &&
+        !isRequestError &&
+        !model.isLoading &&
+        !model.firstLoading &&
+        model.itemsList.isEmpty &&
+        connectionStatus.interNetConnected;
+
+    //タグ詳細ページ、マイページの時は、APIエラーメッセージを表示しない
+    final showApiError = (widget.pageName != PageName.tagDetailList ||
+            widget.pageName == PageName.myPage) &&
+        !model.firstLoading &&
+        connectionStatus.interNetConnected &&
+        isRequestError;
+
     return RefreshIndicator(
       onRefresh: _onRefresh,
       child: Stack(
@@ -200,6 +216,7 @@ class ArticleDetailListBodyContentState
                         // pull to refresh（Feedページ専用）
 
                         child: widget.pageName == PageName.feed
+                        || widget.pageName == PageName.tagDetailList
                             ? RefreshIndicator(
                                 onRefresh: _onRefresh,
                                 child: _buildLists(model))
@@ -209,19 +226,12 @@ class ArticleDetailListBodyContentState
               ),
             ),
           ),
-          if (widget.pageName == PageName.feed &&
-              !isRequestError &&
-              !model.isLoading &&
-              !model.firstLoading &&
-              model.itemsList.isEmpty &&
-              connectionStatus.interNetConnected)
+          if (showNoResult)
             // 検索結果が見つからない時に表示する（Feedページ限定）
             Stack(
               children: [_buildNoResultWidget()],
             ),
-          if (!model.firstLoading &&
-              connectionStatus.interNetConnected &&
-              isRequestError)
+          if (showApiError)
             //APIリクエストエラーがある時は表示する
             buildApiErrorWidget(context, widget.pageName),
         ],
