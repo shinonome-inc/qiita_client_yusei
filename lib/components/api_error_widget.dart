@@ -15,7 +15,7 @@ Widget buildApiErrorWidget(context, PageName pageName) {
       heightRatio = 0.158;
       break;
     case PageName.tags:
-      // heightRatio = 0.209;
+      heightRatio = 0.209;
       break;
     case PageName.tagDetailList:
       break;
