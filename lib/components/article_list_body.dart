@@ -149,7 +149,7 @@ class ArticleDetailListBodyContentState
 
     //タグ詳細ページ、マイページの時は、APIエラーメッセージを表示しない
     final showApiError = (widget.pageName != PageName.tagDetailList ||
-            widget.pageName == PageName.myPage) &&
+            widget.pageName != PageName.myPage) &&
         !model.firstLoading &&
         connectionStatus.interNetConnected &&
         isRequestError;
@@ -215,8 +215,8 @@ class ArticleDetailListBodyContentState
                     Expanded(
                         // pull to refresh（Feedページ専用）
 
-                        child: widget.pageName == PageName.feed
-                        || widget.pageName == PageName.tagDetailList
+                        child: widget.pageName == PageName.feed ||
+                                widget.pageName == PageName.tagDetailList
                             ? RefreshIndicator(
                                 onRefresh: _onRefresh,
                                 child: _buildLists(model))
