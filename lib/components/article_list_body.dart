@@ -148,7 +148,7 @@ class ArticleDetailListBodyContentState
         connectionStatus.interNetConnected;
 
     //タグ詳細ページ、マイページの時は、APIエラーメッセージを表示しない
-    final showApiError = (widget.pageName != PageName.tagDetailList ||
+    final showApiError = (widget.pageName != PageName.tagDetailList &&
             widget.pageName != PageName.myPage) &&
         !model.firstLoading &&
         connectionStatus.interNetConnected &&
