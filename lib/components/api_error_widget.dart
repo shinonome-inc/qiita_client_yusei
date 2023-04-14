@@ -26,6 +26,7 @@ Widget buildApiErrorWidget(context, PageName pageName) {
   return Scaffold(
     body: Center(
       child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           children: [
             SizedBox(height: deviceHeight * heightRatio),
