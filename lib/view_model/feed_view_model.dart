@@ -47,6 +47,7 @@ class FeedViewModel extends ChangeNotifier {
       notifyListeners();
     }
     firstLoading = false;
+    notifyListeners();
   }
 
   // Feedページ：TextFieldでEnterを押した時に呼ばれる

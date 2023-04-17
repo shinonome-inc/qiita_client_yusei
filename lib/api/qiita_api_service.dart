@@ -47,10 +47,8 @@ class QiitaApiService {
     }
   }
 
-  // キャッシュのための変数
-  final Map<String, dynamic> cache = {};
-
   Future<List<dynamic>> fetchQiitaItems({
+    // QiitaのAPIから記事一覧・タグ一覧を取得
     required int currentPage,
     required int perPage,
     required String searchKeyword,
@@ -58,11 +56,16 @@ class QiitaApiService {
     required PageName pageName,
   }) async {
     if (!isLastPage) {
+      //デフォルト値をfalseに設定
+      isRequestError = false;
+
       // Qiita APIのエンドポイントURL
       String apiUrl = '';
       switch (pageName) {
         case PageName.feed:
           apiUrl = 'https://qiita.com/api/v2/items';
+          break;
+        case PageName.tags:
           break;
         case PageName.tagDetailList:
           apiUrl = 'https://qiita.com/api/v2/tags/$searchKeyword/items';
@@ -78,54 +81,42 @@ class QiitaApiService {
         url += '&query=$searchKeyword';
       }
 
-      // キャッシュがある場合、キャッシュを使用する
-      if (cache.containsKey(url)) {
-        final List<dynamic> itemsList = cache[url];
-        if (itemsList.length < perPage) {
-          isLastPage = true;
-        }
-        return itemsList;
-      } else {
-        try {
-          late http.Response response;
-          print(accessToken);
-          // Qiita APIにリクエストを送信する
-          response = await http.get(
-            Uri.parse(url),
-            headers: (accessToken != '')
-                ? {
-                    'Authorization': 'Bearer $accessToken',
-                  }
-                : null,
-          );
+      try {
+        late http.Response response;
+        print(accessToken);
+        // Qiita APIにリクエストを送信する
+        response = await http.get(
+          Uri.parse(url),
+          headers: (accessToken != '')
+              ? {
+                  'Authorization': 'Bearer $accessToken',
+                }
+              : null,
+        );
 
-          // レスポンスをパースし、記事のリストを作成する
-          final List<dynamic> newItems = json.decode(response.body);
-          print(url);
+        // print(response.body);
+
+        // レスポンスをパースし、記事のリストを作成する
+        final List<dynamic> newItems = json.decode(response.body);
+        print(url);
+
+        if (newItems.isEmpty) {
+          // 検索結果が見つからなかった場合は、現在の記事リストをクリアして、最初のページから再度取得する
+          isLastPage = true;
+          return [];
+        } else {
+          if (newItems.length < perPage) {
+            isLastPage = true;
+          }
 
           // print(newItems);
-          // キャッシュに記事を追加する
-          cache[url] = newItems;
-
-          // キャッシュのクリア
-          if (cache.length > 10) {
-            cache.remove(cache.keys.first);
-          }
-
-          if (newItems.isEmpty) {
-            // 検索結果が見つからなかった場合は、現在の記事リストをクリアして、最初のページから再度取得する
-            isLastPage = true;
-            return [];
-          } else {
-            if (newItems.length < perPage) {
-              isLastPage = true;
-            }
-            return newItems;
-          }
-        } catch (e) {
-          print('fetchQiitaItems error: $e');
-          return [];
+          return newItems;
         }
+      } catch (e) {
+        //エラーを検知した場合はtrue
+        isRequestError = true;
+
+        print('fetchQiitaItems error: $e');
       }
     }
     return [];
@@ -134,21 +125,26 @@ class QiitaApiService {
   Future<List<Tag>> fetchTagList(int currentPage, int perPage) async {
     // QiitaのAPIからタグ一覧を取得
 
-    late http.Response response;
+    //デフォルト値をfalseに設定
+    isRequestError = false;
 
-    response = await http.get(
-      Uri.parse(
-          'https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count'),
-      headers: (accessToken != '')
-          ? {
-              'Authorization': 'Bearer $accessToken',
-            }
-          : null,
-    );
-    print(
-        'https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count');
-    if (response.statusCode == 200) {
+    try {
+      late http.Response response;
+
+      response = await http.get(
+        Uri.parse(
+            'https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count'),
+        headers: (accessToken != '')
+            ? {
+                'Authorization': 'Bearer $accessToken',
+              }
+            : null,
+      );
+      print(
+          'https://qiita.com/api/v2/tags?page=$currentPage&per_page=$perPage&sort=count');
+
       final data = jsonDecode(response.body);
+
       if (data == null) {
         return [];
       }
@@ -161,8 +157,12 @@ class QiitaApiService {
           itemsCount: tagData['items_count'] ?? 0,
         );
       }).toList();
+
       return tags;
-    } else {
+    } catch (e) {
+      //エラーを検知した場合はtrue
+      isRequestError = true;
+
       throw Exception('Failed to load tags');
     }
   }
@@ -203,6 +203,7 @@ class QiitaApiService {
       followeesCount: response.data['followees_count'] ?? 0,
       followersCount: response.data['followers_count'] ?? 0,
     );
+
     return userData;
   }
 }

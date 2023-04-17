@@ -53,83 +53,83 @@ class FeedPageState extends State<FeedPage> {
       appBar: !connectionStatus.interNetConnected
           ? null
           : CustomAppBar(
-        title: 'Feed',
-        titleWidget: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(top: 27, bottom: 19),
-              child: Text(
-                'Feed',
-                style: TextStyle(
-                  fontFamily: 'Pacifico',
-                  fontSize: 17.0,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 36,
-              width: MediaQuery.of(context).size.width,
-              child: Theme(
-                data: Theme.of(context)
-                    .copyWith(primaryColor: const Color(0xFF74C13A)),
-                child: TextField(
-                  textAlignVertical: TextAlignVertical.center,
-                  style: TextStyle(
-                    color: const Color(0xFF3C3C43).withOpacity(0.6),
-                    fontWeight: FontWeight.w400,
-                    fontSize: 17,
-                    height: 1,
-                    letterSpacing: -0.41,
+              title: 'Feed',
+              titleWidget: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 27, bottom: 19),
+                    child: Text(
+                      'Feed',
+                      style: TextStyle(
+                        fontFamily: 'Pacifico',
+                        fontSize: 17.0,
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
-                  controller: clearController,
-                  onChanged: (value) {
-                    setState(() {
-                      feedViewModel.searchKeyword = value;
-                    });
-                  },
+                  SizedBox(
+                    height: 36,
+                    width: MediaQuery.of(context).size.width,
+                    child: Theme(
+                      data: Theme.of(context)
+                          .copyWith(primaryColor: const Color(0xFF74C13A)),
+                      child: TextField(
+                        textAlignVertical: TextAlignVertical.center,
+                        style: TextStyle(
+                          color: const Color(0xFF3C3C43).withOpacity(0.6),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 17,
+                          height: 1,
+                          letterSpacing: -0.41,
+                        ),
+                        controller: clearController,
+                        onChanged: (value) {
+                          setState(() {
+                            feedViewModel.searchKeyword = value;
+                          });
+                        },
 
-                  // 検索キーワードを更新すると同時に、記事を更新する
-                  onSubmitted: (String value) async {
-                    await feedViewModel.handleSubmitted(value);
-                  },
-                  decoration: InputDecoration(
-                    contentPadding:
-                    const EdgeInsets.fromLTRB(30, 7, 0, 7),
-                    hintText: 'Search',
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      // color: Color(0xFF74C13A)
-                    ),
-                    suffixIcon: feedViewModel.searchKeyword.isNotEmpty
-                        ? IconButton(
-                      onPressed: () {
-                        setState(() {
-                          feedViewModel.searchKeyword = '';
-                        });
-                        clearController.clear();
-                      },
-                      padding: const EdgeInsets.all(0),
-                      icon: const Icon(Icons.clear),
-                      color: Colors.grey,
-                    )
-                        : null,
-                    filled: true,
-                    fillColor: const Color(0xFF767680).withOpacity(0.12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
+                        // 検索キーワードを更新すると同時に、記事を更新する
+                        onSubmitted: (String value) async {
+                          await feedViewModel.handleSubmitted(value);
+                        },
+                        decoration: InputDecoration(
+                          contentPadding:
+                              const EdgeInsets.fromLTRB(30, 7, 0, 7),
+                          hintText: 'Search',
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            // color: Color(0xFF74C13A)
+                          ),
+                          suffixIcon: feedViewModel.searchKeyword.isNotEmpty
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      feedViewModel.searchKeyword = '';
+                                    });
+                                    clearController.clear();
+                                  },
+                                  padding: const EdgeInsets.all(0),
+                                  icon: const Icon(Icons.clear),
+                                  color: Colors.grey,
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: const Color(0xFF767680).withOpacity(0.12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(
+                    height: 10,
+                  )
+                ],
               ),
             ),
-            const SizedBox(
-              height: 10,
-            )
-          ],
-        ),
-      ),
       body: ChangeNotifierProvider(
           create: (_) => feedViewModel,
           child: const ArticleDetailListBodyContent(

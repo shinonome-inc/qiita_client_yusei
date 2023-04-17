@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../components/api_error_widget.dart';
 import '../components/custom_appbar.dart';
 import '../components/loading_widget.dart';
 import '../components/no_internet_widget.dart';
 import '../components/tag_card.dart';
 import '../main.dart';
+import '../model/page_name.dart';
 import '../util/connection_status.dart';
 import '../view_model/tag_view_model.dart';
 
@@ -34,7 +36,7 @@ class _TagPageState extends State<TagPage> {
   }
 
   Widget _buildInitialLoadingWidget() {
-    return const LoadingWidget(radius: 22.0, color: Color(0xFF6A717D));
+    return const LoadingWidget(radius: 18.0, color: Color(0xFF6A717D));
   }
 
   Widget _buildNoInternetWidget() {
@@ -54,6 +56,17 @@ class _TagPageState extends State<TagPage> {
 
   Widget _buildLoadingWidget() {
     return const LoadingWidget(radius: 18.0, color: Color(0xFF6A717D));
+  }
+
+  Future<void> _onRefresh() async {
+    // オーバースクロールされた時に実行する関数を定義
+
+    //pull to refresh時はページ数、タグリストを初期化して取得し直す
+    tagViewModel.tags.clear();
+    tagViewModel.firstLoading = true;
+    tagViewModel.isLastPage = false;
+    await tagViewModel.fetchTags();
+    _buildTagsGridView(tagViewModel);
   }
 
   Widget _buildTagsGridView(TagViewModel model) {
@@ -81,30 +94,33 @@ class _TagPageState extends State<TagPage> {
         return false;
       },
       child: Padding(
-        padding: const EdgeInsets.only(left: 17, right: 17),
-        child: GridView.builder(
-          shrinkWrap: true,
-          itemCount: model.tags.isNotEmpty
-              ? model.tags.length + (model.isLastPage ? 0 : 1)
-              : 1,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == model.tags.length) {
-              return Padding(
-                padding: EdgeInsets.fromLTRB(paddingLeft, 0, 0, 10),
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: _buildLoadingWidget(),
-                ),
-              );
-            } else {
-              return TagCard(tag: model.tags[index]);
-            }
-          },
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            childAspectRatio: 1.0,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            crossAxisCount: crossAxisCount,
+        padding: const EdgeInsets.only(left: 17, right: 17, top: 16),
+        child: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: GridView.builder(
+            shrinkWrap: true,
+            itemCount: model.tags.isNotEmpty
+                ? model.tags.length + (model.isLastPage ? 0 : 1)
+                : 1,
+            itemBuilder: (BuildContext context, int index) {
+              if (index == model.tags.length) {
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(paddingLeft, 0, 0, 10),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: _buildLoadingWidget(),
+                  ),
+                );
+              } else {
+                return TagCard(tag: model.tags[index]);
+              }
+            },
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: 1.0,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              crossAxisCount: crossAxisCount,
+            ),
           ),
         ),
       ),
@@ -122,21 +138,20 @@ class _TagPageState extends State<TagPage> {
         value: tagViewModel,
         child: Consumer<TagViewModel>(
           builder: (context, model, child) {
-            if (model.firstLoading &&
+            final showInitialLoad = model.firstLoading &&
                 model.tags.isEmpty &&
-                connectionStatus.interNetConnected) {
+                !isRequestError &&
+                connectionStatus.interNetConnected;
+            if (showInitialLoad) {
               return _buildInitialLoadingWidget();
             } else if (!connectionStatus.interNetConnected &&
                 model.tags.isEmpty) {
               return _buildNoInternetWidget();
             } else {
               return Stack(
-                children: [
-                  Visibility(
-                    visible: model.tags.isNotEmpty,
-                    child: _buildTagsGridView(model),
-                  ),
-                ],
+                children: model.isError && model.tags.isEmpty
+                    ? [buildApiErrorWidget(context, PageName.tags)]
+                    : [_buildTagsGridView(model)],
               );
             }
           },

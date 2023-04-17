@@ -30,7 +30,8 @@ class LoadingWidget extends StatelessWidget {
       );
     }
 
-    return Center(
+    return Align(
+      alignment: !isCircle ? Alignment.topCenter : Alignment.center,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: indicator,
