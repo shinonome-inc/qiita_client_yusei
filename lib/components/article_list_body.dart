@@ -72,7 +72,7 @@ class ArticleDetailListBodyContentState
     }
   }
 
-  Future _onRefresh() async {
+  Future<void> _onRefresh() async {
     // オーバースクロールされた時に実行する関数を定義
 
     if (_feedViewModel.searchKeyword.isEmpty &&
@@ -85,7 +85,7 @@ class ArticleDetailListBodyContentState
       _feedViewModel.itemsList.clear();
       _feedViewModel.currentPage = 1;
       _feedViewModel.isLastPage = false;
-      fetchItems(_feedViewModel, widget.pageName, widget.tag);
+      await fetchItems(_feedViewModel, widget.pageName, widget.tag);
 
       _buildLists(_feedViewModel);
     }

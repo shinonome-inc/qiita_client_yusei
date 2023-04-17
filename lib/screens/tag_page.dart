@@ -58,14 +58,14 @@ class _TagPageState extends State<TagPage> {
     return const LoadingWidget(radius: 18.0, color: Color(0xFF6A717D));
   }
 
-  Future _onRefresh() async {
+  Future<void> _onRefresh() async {
     // オーバースクロールされた時に実行する関数を定義
 
     //pull to refresh時はページ数、タグリストを初期化して取得し直す
     tagViewModel.tags.clear();
     tagViewModel.firstLoading = true;
     tagViewModel.isLastPage = false;
-    tagViewModel.fetchTags();
+    await tagViewModel.fetchTags();
     _buildTagsGridView(tagViewModel);
   }
 
