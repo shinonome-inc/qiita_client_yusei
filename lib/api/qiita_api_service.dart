@@ -145,8 +145,6 @@ class QiitaApiService {
 
       final data = jsonDecode(response.body);
 
-      // print(response.body);
-
       if (data == null) {
         return [];
       }
@@ -165,7 +163,6 @@ class QiitaApiService {
       //エラーを検知した場合はtrue
       isRequestError = true;
 
-      // print(isRequestError);
       throw Exception('Failed to load tags');
     }
   }
